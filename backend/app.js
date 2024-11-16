@@ -1,6 +1,9 @@
 import express from 'express';
+import customerRouter from './routes/customerRouter.js';
 
 const app = express();
+
+app.use('/customer', customerRouter);
 
 app.get('/', (req, res) => {
     res.send('Hello!');
