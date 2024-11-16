@@ -1,3 +1,8 @@
+import dotenv from 'dotenv';
+import path from 'node:path';
+
+dotenv.config({ path: path.resolve('..', 'backend', '.env') });
+
 const config = {
     connectionLimit: 10,
     host: process.env.DB_HOST,
