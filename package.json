@@ -1,5 +1,6 @@
 {
   "dependencies": {
+    "express-validator": "^7.2.0",
     "mysql": "^2.18.1"
   }
 }
