@@ -1,10 +1,11 @@
 import { body } from 'express-validator';
 import { pool } from '../../db/pool.js';
 
-export default function createEmailValidator() {
+export default function createEmailValidator({ emptyEmail, invalidEmail, duplicateEmail }) {
     return body('email').trim()
-        .isEmail().withMessage('Invalid email')
-        .custom(isUniqueEmail).withMessage('Email is already in use');
+        .notEmpty().withMessage(emptyEmail)
+        .isEmail().withMessage(invalidEmail)
+        .custom(isUniqueEmail).withMessage(duplicateEmail);
 }
 
 async function isUniqueEmail(email) {

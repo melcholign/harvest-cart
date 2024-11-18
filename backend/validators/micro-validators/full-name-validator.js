@@ -1,6 +1,6 @@
 import { body } from 'express-validator';
 
-export default function createFullNameValidator() {
+export default function createFullNameValidator({ emptyFullName }) {
     return body('fullName').trim()
-        .exists({ values: 'falsy' }).withMessage('Full name is required.');
+        .notEmpty().withMessage(emptyFullName);
 }

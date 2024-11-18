@@ -3,14 +3,15 @@ import createEmailValidator from './micro-validators/email-validator.js';
 import createPasswordValidator from './micro-validators/pwd-validator.js';
 import createPasswordConfirmationValidator from './micro-validators/pwd-confirmation-validator.js';
 import createPhoneNumberValidator from './micro-validators/phone-no-validator.js';
+import valArgs from './validator-args/customer.js';     // validator arguments
 
 function createCustomerValidator() {
     return [
-        createFullNameValidator(),
-        createEmailValidator(),
-        createPasswordValidator(),
-        createPasswordConfirmationValidator(),
-        createPhoneNumberValidator(),
+        createFullNameValidator(valArgs.fullName.errorMessages),
+        createEmailValidator(valArgs.email.errorMessages),
+        createPasswordValidator(valArgs.password.length, valArgs.password.errorMessages),
+        createPasswordConfirmationValidator(valArgs.passwordConfirmation.errorMessages),
+        createPhoneNumberValidator(valArgs.phoneNumber.locale, valArgs.phoneNumber.errorMessages),
     ]
 }
 

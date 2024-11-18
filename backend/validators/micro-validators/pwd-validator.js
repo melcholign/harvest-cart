@@ -1,11 +1,20 @@
 import { body } from 'express-validator';
 
-export default function createPasswordValidator() {
+export default function createPasswordValidator(
+    { min, max },
+    {
+        emptyPassword,
+        invalidLength,
+        noUpperCase,
+        noLowerCase,
+        noDigit,
+    }) {
     return body('password').trim()
-        .isLength({ min: 8 }).withMessage('Password must be at least 8 characters long.')
-        .custom(hasUpperCase).withMessage('Password must have at least 1 upper case character.')
-        .custom(hasLowerCase).withMessage('Password must have at least 1 lower case character.')
-        .custom(hasDigit).withMessage('Password must have at least 1 digit.');
+        .notEmpty().withMessage(emptyPassword)
+        .isLength({ min, max }).withMessage(invalidLength)
+        .custom(hasUpperCase).withMessage(noUpperCase)
+        .custom(hasLowerCase).withMessage(noLowerCase)
+        .custom(hasDigit).withMessage(noDigit);
 }
 
 function hasLowerCase(string) {
