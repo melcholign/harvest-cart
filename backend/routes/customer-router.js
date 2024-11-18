@@ -1,9 +1,9 @@
 import express from 'express';
+import createCustomerValidator from '../validators/customer/customer-validator.js';
+import { customerCreateController } from '../controllers/customer-controller.js';
 
 const router = express.Router();
 
-router.post('/create', (req, res) => {
-    res.send('Customer account data will be posted to this route');
-});
+router.post('/create', createCustomerValidator(), customerCreateController);
 
 export default router;
