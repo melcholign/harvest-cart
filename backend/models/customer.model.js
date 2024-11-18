@@ -17,13 +17,13 @@ await pool.query(schema);
 
 class Customer {
 
-    static async create(data) {
+    static async create({ fullName, email, phoneNumber, hashedPassword }) {
         const query =
             'INSERT INTO '
             + 'customer (full_name, email, phone_number, password_hash)'
             + 'VALUES (?, ?, ?, ?)';
 
-        const [{ insertId }] = await pool.query(query, data);
+        const [{ insertId }] = await pool.query(query, [fullName, email, phoneNumber, hashedPassword]);
 
         return insertId;
     }

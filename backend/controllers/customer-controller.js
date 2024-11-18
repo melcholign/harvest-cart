@@ -1,18 +1,23 @@
 import { validationResult, matchedData } from 'express-validator';
+import bcrypt from 'bcrypt';
 import { formatValidationResult } from '../validators/formatters.js';
 import { Customer } from '../models/customer.model.js';
 
-function customerCreateController(req, res) {
+async function customerCreateController(req, res) {
     const result = validationResult(req);
-    const formattedResult = formatValidationResult(result);
 
-    if (formattedResult.length != 0) {
+    if (!result.isEmpty()) {
+        const formattedResult = formatValidationResult(result);
         res.status(400).json(formattedResult);
         return;
     }
 
     const data = matchedData(req);
-    res.status(2000).json(data);
+    const hashedPassword = await bcrypt.hash(data.password, 10);
+
+    await Customer.create({ ...data, hashedPassword });
+
+    res.sendStatus(200);
 }
 
 export {
