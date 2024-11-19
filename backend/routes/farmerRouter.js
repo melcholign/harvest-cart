@@ -1,17 +1,28 @@
-const express = require('express');
-const farmerController = require('../controllers/farmerController');
-const authMiddleware = require('../middleware/authMiddleware');   
+import express from 'express';
+import { farmerController } from '../controllers/farmerController';
+import passport from 'passport';
+
+
+passport.use(new LocalStrategy(
+    function(username, password, done) {
+      farmerController.getByID({ username: username }, function (err, user) {
+        if (err) { return done(err); }
+        if (!user) { return done(null, false); }
+        if (!user.verifyPassword(password)) { return done(null, false); }
+        return done(null, user);
+      });
+    }
+  ));
+
 
 const router = express.Router();
 
 // Public routes
-router.post('/register', farmerController.registerFarmer);
-router.post('/login', farmerController.loginFarmer);
+router.post('/register', farmerController.register);
+router.post('/login', farmerController.login);
 
-// Protected routes   
-router.get('/:farmerID', authMiddleware, farmerController.getFarmerProfile);
-router.put('/:farmerID/update', authMiddleware, userController.updateUserProfile);
-router.post('/:farmerID/store', authMiddleware, userController.addToCart);
-router.delete('/:farmerID/delete', authMiddleware, userController.removeFromCart);
+// Protected routes
+router.put('/update', authMiddleware, farmerController.update);
+router.delete('/delete', authMiddleware, userController.removeFromCart);
 
 module.exports = router;
