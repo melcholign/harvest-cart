@@ -5,8 +5,13 @@ class FarmerModel{
         const query =
         `SELECT * FROM farmer;`;
 
-        const [results, fields] = await pool.query(query);
-        return [results, fields];
+        try{
+            const [results, fields] = await pool.query(query);
+            return [results, fields];
+        } catch(err){
+            console.log("Error executing query:" + err);
+            throw err;
+        }
     }
 
     static async getByEmail(email) {
@@ -15,8 +20,13 @@ class FarmerModel{
          FROM farmer f
          WHERE f.email = "${email}";`;
 
-         const [results, fields] = await pool.query(query);
-         return [results, fields];
+        try{
+            const [results, fields] = await pool.query(query);
+            return [results, fields];
+        } catch(err){
+            console.log("Error executing query:" + err);
+            throw err;
+        }
     }
 
     static async getByID(id){
@@ -25,8 +35,13 @@ class FarmerModel{
          FROM farmer f
          WHERE f.farmer_id = "${id}";`;
 
-         const [results, fields] = await pool.query(query);
-         return [results, fields];
+        try{
+            const [results, fields] = await pool.query(query);
+            return [results, fields];
+        } catch(err){
+            console.log("Error executing query:" + err);
+            throw err;
+        }
     }
 
 
@@ -37,12 +52,11 @@ class FarmerModel{
          VALUES ('${firstname}', '${lastname}', '${gender}', '${dob}', '${mobile}', '${address}', '${NID_img_path}', '${pfp_img_path}', '${email}', '${pass_hash}');`;
 
         try{
-            await pool.query(query);
-            console.log("Completed")
-            return "1 row inserted";
-        }catch(err){
-            console.log(err);
-            return err;
+            const [results, fields] = await pool.query(query);
+            return [results, fields];
+        } catch(err){
+            console.log("Error executing query:" + err);
+            throw err;
         }
     }
 
@@ -58,15 +72,16 @@ class FarmerModel{
          nid_img_path = '${NID_img_path}',
          pfp_img_path = '${pfp_img_path}',
          email = '${email}',
-         pass_hash = '${pass_hash}',
-         WHERE farmer_ID = '${farmer_id}';`;
+         pass_hash = '${pass_hash}'
+         WHERE farmer_id = ${farmer_id};`;
 
         try{
-            await pool.query(query);
-            return "1 row updated";
-         }catch(err){
-            return err;
-         }
+            const [results, fields] = await pool.query(query);
+            return [results, fields];
+        } catch(err){
+            console.log("Error executing query:" + err);
+            throw err;
+        }
     }
 
 
@@ -76,19 +91,23 @@ class FarmerModel{
         WHERE farmer_id = '${farmer_ID}';`;
 
         try{
-            await pool.query(query);
-            return "1 row updated";
-         }catch(err){
-            return err;
-         }
+            const [results, fields] = await pool.query(query);
+            return [results, fields];
+        } catch(err){
+            console.log("Error executing query:" + err);
+            throw err;
+        }
 
     }
 }
 
 // testing
-//console.log(FarmerModel.register("fjwo", "fjowo", "M", "24-02-2010", "10853581", "Someplace", "src/imgs/farmer/NID/wejofoej.jpg", "src/imgs/farmer/pfp/fowjfoj.jpg", "farmer@gmail.com", "14103481AEF4014080"));
-console.log(await FarmerModel.getAll());
-console.log(await FarmerModel.getByEmail('farmer@gmail.com'));
-//console.log(FarmerModel.update("Mweojf", "wofj", "F", "24-02-2010", "10853581", "Noplace", "src/imgs/farmer/NID/wejofoej.jpg", "src/imgs/farmer/pfp/fowjfoj.jpg", "farmer@gmail.com", "14103481AEF4014080", "3"));
+if(0){console.log(await FarmerModel.register("Person", "I", "M", "2001-10-22", "01430850152", "Sylhet", "src/imgs/farmer/NID/wejofoej.jpg", "src/imgs/farmer/pfp/fowjfoj.jpg", "personI@gmail.com", "141fwei81AEF4014080"));}
+if(0){console.log(await FarmerModel.register("Person", "II", "F", "1991-06-05", "01518530911", "Barishal", "src/imgs/farmer/NID/vwojvwow.jpg", "src/imgs/farmer/pfp/fowf32j.jpg", "personII@gmail.com", "fwojfweAEF4014080"));}
+if(0){console.log(await FarmerModel.getAll());}
+if(0){console.log(await FarmerModel.getByEmail('personI@gmail.com'));}
+if(0){console.log(await FarmerModel.delete("8"));}
+if(0){console.log(await FarmerModel.update("Edited", "Person", "E", "24-02-2010", "10853581", "Chittagong", "src/imgs/farmer/NID/wejofoej.jpg", "src/imgs/farmer/pfp/fowjfoj.jpg", "farmer@gmail.com", "14103481AEF4014080", "7"));}
+
 
 export { FarmerModel };
