@@ -1,7 +1,7 @@
 import { validationResult, matchedData } from 'express-validator';
 import bcrypt from 'bcrypt';
 import { formatValidationResult } from '../validators/formatters.js';
-import { CustomerModel } from '../models/customer.model.js';
+import { CustomerModel } from '../models/customer-model.js';
 
 class CustomerController {
 

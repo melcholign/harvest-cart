@@ -4,15 +4,15 @@ import { generateRandomCode } from '../utils/random-code-generator.js';
 
 const schema =
     `
-CREATE TABLE IF NOT EXISTS verification_code (
-    customer_id INT,
+CREATE TABLE IF NOT EXISTS VerificationCode (
+    customerId INT,
     purpose ENUM('verify_account', 'reset_password'),
-    code_hash VARCHAR(255),
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    expiry_at TIMESTAMP DEFAULT (CURRENT_TIMESTAMP + INTERVAL 1 HOUR),
+    hashedCode VARCHAR(255),
+    createdAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    expiryAt TIMESTAMP DEFAULT (CURRENT_TIMESTAMP + INTERVAL 1 HOUR),
 
-    PRIMARY KEY (customer_id, purpose),
-    FOREIGN KEY (customer_id) REFERENCES customer(id)
+    PRIMARY KEY (customerId, purpose),
+    FOREIGN KEY (customerId) REFERENCES customer(id)
 )
 `
 await pool.query(schema);
@@ -32,7 +32,7 @@ class VerificationCodeModel {
         const code = generateRandomCode(this.#DEFAULT_CODE_LENGTH);
         const hashedCode = await bcrypt.hash(code, this.#DEFAULT_HASH_SALT);
 
-        const query = 'INSERT INTO verification_code(customer_id, purpose, code_hash, expiry_at) '
+        const query = 'INSERT INTO VerificationCode(customerId, purpose, hashedCode, expiryAt) '
             + 'VALUES(?, ?, ?, CURRENT_TIMESTAMP + INTERVAL ? MINUTE)';
         await pool.query(query, [customerId, purpose, hashedCode, expiryMinutes]);
 
@@ -41,8 +41,8 @@ class VerificationCodeModel {
 
     static async verify(code, customerId, purpose) {
         const getCodeQuery =
-            'SELECT code_hash AS hashedCode, expiry_at AS expiryAt '
-            + 'FROM verification_code WHERE customer_id = ? AND purpose = ?';
+            'SELECT hashedCode AS hashedCode, expiryAt AS expiryAt '
+            + 'FROM VerificationCode WHERE customerId = ? AND purpose = ?';
         const [results] = await pool.query(getCodeQuery, [customerId, purpose]);
 
         const matchedRecord = await this.#findRecordWithCode(code, results);
@@ -54,7 +54,7 @@ class VerificationCodeModel {
         }
 
         const deleteCodeQuery =
-            'DELETE FROM verification_code WHERE customer_id = ? AND code_hash = ?'
+            'DELETE FROM VerificationCode WHERE customerId = ? AND hashedCode = ?'
         pool.query(deleteCodeQuery, [customerId, matchedRecord.hashedCode]);
 
         const currentTimeStamp = new Date(Date.now());

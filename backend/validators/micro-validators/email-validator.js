@@ -9,7 +9,7 @@ export default function createEmailValidator({ emptyEmail, invalidEmail, duplica
 }
 
 async function isUniqueEmail(email) {
-    const query = 'SELECT email FROM customer WHERE email = ?';
+    const query = 'SELECT email FROM Customer WHERE email = ?';
     const [results] = await pool.query(query, [email]);
 
     if (results.length != 0) {

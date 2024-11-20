@@ -2,24 +2,25 @@ import { pool } from '../db/pool.js';
 
 const schema =
     `
-CREATE TABLE IF NOT EXISTS customer (
+CREATE TABLE IF NOT EXISTS Customer (
     id INT AUTO_INCREMENT PRIMARY KEY,
-    full_name VARCHAR(255) NOT NULL,
+    fullName VARCHAR(255) NOT NULL,
     email VARCHAR(255) UNIQUE NOT NULL,
-    phone_number VARCHAR(15),
-    password_hash VARCHAR(255) NOT NULL,
-    is_verified BOOLEAN DEFAULT FALSE,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+    phoneNumber VARCHAR(15),
+    hashedPassword VARCHAR(255) NOT NULL,
+    isVerified BOOLEAN DEFAULT FALSE,
+    createdAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updatedAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 )
 `
+await pool.query(schema);
 
 class CustomerModel {
 
-    static async create({ fullName, email, phoneNumber, hashedPassword }) {
+    static async create({fullName, email, phoneNumber, hashedPassword}) {
         const query =
             'INSERT INTO '
-            + 'customer (full_name, email, phone_number, password_hash)'
+            + 'Customer (fullName, email, phoneNumber, hashedPassword) '
             + 'VALUES (?, ?, ?, ?)';
         const [{ insertId }] = await pool.query(
             query, [fullName, email, phoneNumber, hashedPassword]
@@ -29,35 +30,33 @@ class CustomerModel {
     }
 
     static async update(id, field, value) {
-        const query = `UPDATE customer SET ${field} = ? WHERE id = ?`;
+        const query = `UPDATE Customer SET ${field} = ? WHERE id = ?`;
         await pool.query(query, [value, id]);
     }
 
-    static async get(id) {
-        const query = 'SELECT * FROM customer WHERE id = ?';
-        const [results] = await pool.query(query, [id]);
+    static async get(email) {
+        const query = 'SELECT * FROM Customer WHERE email = ?';
+        const [results] = await pool.query(query, [email]);
 
         return results[0];
     }
 
     static async getAll() {
-        const query = 'SELECT * FROM customer';
+        const query = 'SELECT * FROM Customer';
         const [results] = await pool.query(query);
 
         return results;
     }
 
     static async delete(id) {
-        const query = 'DELETE FROM customer WHERE id = ?';
+        const query = 'DELETE FROM Customer WHERE id = ?';
         await pool.query(query, [id]);
     }
 
     static async verify(id) {
-        const query = 'UPDATE customer SET is_verified = 1 WHERE id = ?';
+        const query = 'UPDATE Customer SET isVerified = 1 WHERE id = ?';
         await pool.query(query, [id]);
     }
 }
-
-CustomerModel.verify(4);
 
 export { CustomerModel };
