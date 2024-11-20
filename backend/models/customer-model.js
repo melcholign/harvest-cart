@@ -1,7 +1,7 @@
-import { pool } from './../db/pool.js';
+import { pool } from '../db/pool.js';
 
 const schema =
-    `
+`
 CREATE TABLE IF NOT EXISTS customer (
     id INT AUTO_INCREMENT PRIMARY KEY,
     full_name VARCHAR(255) NOT NULL,
@@ -13,7 +13,6 @@ CREATE TABLE IF NOT EXISTS customer (
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 )
 `
-await pool.query(schema);
 
 class Customer {
 
