@@ -1,29 +1,27 @@
 import LocalStrategy from 'passport-local' 
-import bcrypt from 'bcrypt';
+import bcryptjs from 'bcryptjs';
  
 function initializePassport(passport, getFarmerByEmail, getFarmerByID){
     const authenticateFarmer = async (email, password, done) => {
         const [farmer,] = getFarmerByEmail(email);
-
         if(!farmer){
-            return done(null, false, {message: "No user with that email."});
+            return done(null, false, {message: "Email or password incorrect."});
         }
-
         try {
-            if (await bcrypt.compare(password, farmer.pass_hash)){
-                return done(null, farmer);
-            } else {
-                return done(null, false, {message: "Password Incorrect."})
+            if (!(await bcryptjs.compare(password, farmer.pass_hash))){
+                return done(null, false, {message: "Email or password incorrect."});
             }
+            return done(null, farmer);
         } catch(err) {
             return done(err);
         }
     }
     passport.use(new LocalStrategy({ usernameField: 'email'}, authenticateFarmer));
-    passport.serializeUser((user, done) => done(null,farmer.farmer_id));
+    passport.serializeUser((farmer, done) => done(null,farmer.farmer_id));
     passport.deserializeUser((farmer_id, done) => {
         return done(null, getFarmerByID(farmer_id));
     });
 } 
+
 
 export {initializePassport};
