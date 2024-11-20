@@ -1,6 +1,5 @@
 import express from 'express';
 import passport from 'passport';
-
 import { initializePassport } from '../middleware/passport-config.js';
 import { FarmerController } from '../controllers/farmerController.js';
 import { FarmerModel } from '../models/farmerModel.js';
@@ -17,8 +16,6 @@ farmerRouter.get('/register', checkNotAuthenticated, (req, res) => {
   res.render("register.ejs");
 })
 farmerRouter.post('/register', checkNotAuthenticated, FarmerController.register);
-
-
 farmerRouter.get('/login', checkNotAuthenticated, (req, res) => {
   res.render('login.ejs');
 })
@@ -30,14 +27,13 @@ farmerRouter.post('/login', checkNotAuthenticated, passport.authenticate('local'
 
 // Protected routes
 farmerRouter.get('', checkAuthenticated, (req, res) => {
-  res.render('index.ejs', { name: req.user.firstname })
+  res.render('index.ejs', { name: req.user.firstname + " " + req.user.lastname})
 })
 farmerRouter.put('/update', checkAuthenticated, FarmerController.update);
 farmerRouter.delete('/delete', checkAuthenticated, FarmerController.delete);
-
-
-farmerRouter.post("/logout", checkAuthenticated, (req, res) => {
-  req.logOut();
+farmerRouter.post("/logout", (req, res) => {
+  req.logout((err) => {
+    if (err) { return next(err); }});
   res.redirect('/farmer/login');
 })
 
@@ -48,10 +44,9 @@ function checkAuthenticated(req, res, next){
   }
   res.redirect('/farmer/login');
 }
-
 function checkNotAuthenticated(req, res, next) {
   if(req.isAuthenticated()){
-    return res.redirect('/');
+    return res.redirect('/farmer');
   }
   next();
 }

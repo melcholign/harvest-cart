@@ -5,9 +5,9 @@ import bcryptjs from 'bcryptjs';
 class FarmerController{
     static async getAll(req, res){
         try{
-            [farmers,] = FarmerModel.getAll();
+            farmers = FarmerModel.getAll();
 
-            if(!farmers){
+            if(farmers.length == 0){
                 return res.json({message: 'No farmer accounts registered'})
             }
             return res.json({ farmers });
@@ -22,7 +22,7 @@ class FarmerController{
         const { id } = req.body;
         
         try{
-            [matchingFarmer,] = FarmerModel.getByID(id);
+            matchingFarmer = FarmerModel.getByID(id);
             
             if(!matchingFarmer){
                 return res.json({ message: 'No farmer of given ID' });
@@ -45,8 +45,8 @@ class FarmerController{
 
         try {
             console.log(email);
-            const [existingFarmer] = await FarmerModel.getByEmail(email);
-
+            const existingFarmer = await FarmerModel.getByEmail(email);
+    
             if(existingFarmer) {
                 return res.status(400).json({ message: 'An account with this email already exists' });
             }
@@ -54,7 +54,7 @@ class FarmerController{
             const hashedPassword = await bcryptjs.hash(password, 10);
             await FarmerModel.register(firstname, lastname, gender, dob, mobile, address, nid, pfp, email, hashedPassword);
             
-            res.status(201).json({ message: 'User registered successfully.' });
+            res.redirect('/farmer/login');;
         }catch(err) {
             console.log(err);
             res.status(500).json({ message: "Server Error" });
@@ -85,21 +85,20 @@ class FarmerController{
         
 
     static async update(req, res){
-        const {firstname, lastname, gender, dob, mobile, address, NID_img_path, pfp_img_path, email, password, farmer_id} = req.body;
+        const {firstname, lastname, gender, dob, mobile, address, nid, pfp, email, password, farmer_id} = req.body;
         
-        if(!(firstname && lastname && dob && mobile && address && NID_img_path && email && password && farmer_id)){
+        if(!(firstname && lastname && dob && mobile && address && nid && email && password && farmer_id)){
             return res.json({ message: "All required input fields must be filled!" });
         }
-
         try {
-            const [existingFarmer,] = await FarmerModel.getByEmail(email);
+            const existingFarmer = await FarmerModel.getByEmail(email);
 
             if(existingFarmer) {
                 return res.status(400).json({ message: 'An account with this email already exists' });
             }
             
             const hashedPassword = await bcryptjs.hash(password, 10);
-            await FarmerModel.update(firstname, lastname, gender, dob, mobile, address, NID_img_path, pfp_img_path, email, hashedPassword, farmer_id);
+            await FarmerModel.update(firstname, lastname, gender, dob, mobile, address, nid, pfp, email, hashedPassword, farmer_id);
             
             res.status(201).json({ message: 'Farmer account updated successfully.' });
         }catch(err) {
