@@ -52,11 +52,6 @@ class CustomerModel {
         const query = 'DELETE FROM Customer WHERE id = ?';
         await pool.query(query, [id]);
     }
-
-    static async verify(id) {
-        const query = 'UPDATE Customer SET isVerified = 1 WHERE id = ?';
-        await pool.query(query, [id]);
-    }
 }
 
 export { CustomerModel };
