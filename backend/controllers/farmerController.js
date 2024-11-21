@@ -54,7 +54,7 @@ class FarmerController{
             const hashedPassword = await bcryptjs.hash(password, 10);
             await FarmerModel.register(firstname, lastname, gender, dob, mobile, address, nid, pfp, email, hashedPassword);
             
-            res.redirect('/farmer/login');;
+            res.redirect('/farmer/login');
         }catch(err) {
             console.log(err);
             res.status(500).json({ message: "Server Error" });
@@ -100,7 +100,7 @@ class FarmerController{
             const hashedPassword = await bcryptjs.hash(password, 10);
             await FarmerModel.update(firstname, lastname, gender, dob, mobile, address, nid, pfp, email, hashedPassword, farmer_id);
             
-            res.status(201).json({ message: 'Farmer account updated successfully.' });
+            res.redirect('/farmer');
         }catch(err) {
             console.log(err);
             res.status(500).json({ message: "Server Error" });
@@ -112,13 +112,12 @@ class FarmerController{
         
         try{
             await FarmerModel.delete(id);
-            res.status(200).json({ message: 'Farmer account deleted successfully' });
+            res.redirect('/farmer/register');
         }catch(err){
             console.log(err);
             res.status(500).json({ message: "Server Error" });
         }
     }
-
 }
 
 export { FarmerController };
