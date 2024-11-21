@@ -15,7 +15,6 @@ app.use(passport.session());
 app.use('/customer', customerRouter);
 
 app.get('/', (req, res) => {
-    console.log(req.user);
     res.send('Hello');
 });
 
