@@ -1,4 +1,5 @@
 import { pool } from '../db/pool.js';
+import { loadSchema } from '../utils/schema-loader.js';
 
 const schema =
     `
@@ -11,8 +12,9 @@ CREATE TABLE IF NOT EXISTS Product (
     category ENUM(
         'fruits', 'vegetables', 'herbs', 'dairy', 
         'poultry', 'seafood', 'red meat', 'fish',
-        'grains', 'condiments', 'spices & seasonings'
-    ),
+        'grains', 'condiments', 'spices & seasonings',
+        'miscellaneous'
+    ) NOT NULL DEFAULT 'miscellaneous',
     rating DOUBLE(3,2),
     stockQuantity INT,
     price FLOAT,
@@ -26,12 +28,7 @@ CREATE TABLE IF NOT EXISTS Product (
     -- FOREIGN KEY(storeId) REFERENCES store(storeId),
 );
 `
-try {
-    await pool.query(schema);
-    console.trace('Product schema is ready...');
-} catch (err) {
-    console.log(err);
-}
+await loadSchema(pool, schema, 'Product');
 
 class ProductModel {
 

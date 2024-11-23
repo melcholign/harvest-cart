@@ -3,7 +3,7 @@ import { pool } from '../db/pool.js';
 const schema =
     `
 CREATE TABLE IF NOT EXISTS Customer (
-    id INT AUTO_INCREMENT PRIMARY KEY,
+    customerId INT AUTO_INCREMENT PRIMARY KEY,
     fullName VARCHAR(255) NOT NULL,
     email VARCHAR(255) UNIQUE NOT NULL,
     phoneNumber VARCHAR(15),
