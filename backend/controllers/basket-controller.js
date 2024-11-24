@@ -16,7 +16,7 @@ class BasketController {
      * @param {Object} res - Represents the HTTP response to return.
      */
     static async getBasket(req, res) {
-        const { id: customerId } = req.user;
+        const { customerId } = req.user;
         let basket = await BasketModel.getBasket(customerId);
 
         const invalidProducts = await BasketController.#getInvalidProducts(basket);
@@ -46,7 +46,7 @@ class BasketController {
      * @param {Object} res - Represents the HTTP response to return.
      */
     static async addProductToBasket(req, res) {
-        const { id: customerId } = req.user;
+        const { customerId } = req.user;
         const { productId } = req.body;
 
         try {
@@ -73,7 +73,7 @@ class BasketController {
      * @param {Object} res - Represents the HTTP response to return.
      */
     static async removeProductFromBasket(req, res) {
-        const { id: customerId } = req.user;
+        const { customerId } = req.user;
         const { productId } = req.params;
 
         try {
@@ -114,7 +114,7 @@ class BasketController {
             });
         }
 
-        const { id: customerId } = req.user;
+        const { customerId } = req.user;
         const { productId } = req.params;
         const currentQuantity = await BasketModel.getQuantity(customerId, productId);
 
@@ -152,10 +152,10 @@ class BasketController {
      * @param {Object} res - Represents the HTTP response to return.
      */
     static async clearBasket(req, res) {
-        const { id: customerId } = req.user;
+        const { customerId } = req.user;
 
         try {
-            await BasketModel.removeProduct(customerId, productId);
+            await BasketModel.clearBasket(customerId);
         } catch (err) {
             // if the basket is ALREADY EMPTY
             return res.status(404).json({
@@ -170,8 +170,16 @@ class BasketController {
     }
 
     static async proceedToCheckout(req, res) {
-        const { id: customerId } = req.user;
+        const { customerId } = req.user;
         const basket = await BasketModel.getBasket(customerId);
+
+        if (basket.length == 0) {
+            return res.status(404).json({
+                error: {
+                    message: 'Nothing to checkout',
+                }
+            })
+        }
 
         const invalidProducts = await BasketController.#getInvalidProducts(basket);
 

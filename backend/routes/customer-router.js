@@ -24,4 +24,6 @@ router.post('/account/logout', (res, req) => {
     });
 });
 
-export default router;
+export {
+    router as customerRouter
+};

@@ -3,7 +3,8 @@ import cors from 'cors';
 import { sessionStore } from './middlewares/session-store.js';
 import { passport } from './middlewares/passport/passport-config.js';
 
-import customerRouter from './routes/customer-router.js';
+import { customerRouter } from './routes/customer-router.js';
+import { basketRouter } from './routes/basket-router.js';
 
 const app = express();
 app.use(express.json());
@@ -13,6 +14,7 @@ app.use(sessionStore);
 app.use(passport.session());
 
 app.use('/customer', customerRouter);
+app.use('/customer/basket', basketRouter);
 
 app.get('/', (req, res) => {
     console.log(req.user);
