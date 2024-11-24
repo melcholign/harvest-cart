@@ -42,8 +42,7 @@ class BasketModel {
             + 'Product.productName AS name, '
             + 'COALESCE(Product.category, \'miscellaneous\') AS category, '
             + 'Basket.productQuantity AS quantity, '
-            + 'Product.price AS unitPrice, '
-            + 'Basket.productQuantity * Product.price AS aggregatePrice '
+            + 'Product.price AS unitPrice '
             + 'FROM Basket JOIN Product ON Basket.productId = Product.productId '
             + 'WHERE Basket.customerId = ?';
         const [results] = await pool.query(query, [customerId]);
