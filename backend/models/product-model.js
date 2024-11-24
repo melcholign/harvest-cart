@@ -45,6 +45,35 @@ class ProductModel {
         CONDIMENTS: 'condiments',
         SPICES_AND_SEASONINGS: 'spices & seasonings',
     }
+
+    /**
+     * Gets list of specific products whose ids are provided in an 
+     * array as the argument, or all products if nothing is passed
+     * to the method
+     * 
+     * @param {Array<Number> | undefined} productIds - list of ids or nothing
+     * @returns {Array<Object>} - list of products
+     */
+    static async getProducts(productIds) {
+        // if no array is provided, then return all products
+        if (!productIds) {
+            let query = 'SELECT * FROM Product';
+            const [results] = await pool.query(query);
+            return results;
+        }
+
+        // if an empty array is provided, then return back an empty array
+        if (productIds.length == 0) {
+            return [];
+        }
+
+        // if array contains one or more ids
+        
+        const commaDelimitedIds = productIds.join(',');
+        const query = `SELECT * FROM Product WHERE productId in (${commaDelimitedIds})`;
+        const [results] = await pool.query(query);
+        return results;
+    }
 }
 
 export {
