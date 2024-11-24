@@ -3,6 +3,24 @@ import bcryptjs from 'bcryptjs';
 
 
 class FarmerController{
+
+    static async searchByName(req, res){
+        const searchString = req.body;
+
+        try{
+            searchResultList = await FarmerModel.searchByName(searchString);
+
+            if(searchResultList.length == 0){
+                res.json({ message: 'No farmers match your searched name.'});
+            }
+            res.json({ searchResultList });
+        } catch(err){
+            console.log(err);
+            res.json({ message: "Server error" });
+        }
+    }
+
+    /*
     static async getAll(req, res){
         try{
             farmers = FarmerModel.getAll();
@@ -17,7 +35,7 @@ class FarmerController{
             res.status(500).json({ message: "Server Error" });
         }
     }
-
+    
     static async getByID(req, res){
         const { id } = req.body;
         
@@ -34,6 +52,7 @@ class FarmerController{
             res.status(500).json({ message: "Server Error" });
         }
     }
+    */
 
     static async register(req, res){
         console.log(req.body);
@@ -81,7 +100,7 @@ class FarmerController{
         
         }            
     }
-        */
+    */
         
 
     static async update(req, res){

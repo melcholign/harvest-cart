@@ -45,6 +45,29 @@ class FarmerModel{
     }
 
 
+    static async searchByName(search_string){
+        const query =
+        `SELECT *
+        FROM farmer f
+        WHERE (f.firstname, ' ', f.lastname) LIKE '%${search_string}%'
+        ORDER BY
+          CASE
+            WHEN (f.firstname, ' ', f.lastname) LIKE '${search_string}' THEN 0
+            WHEN (f.firstname, ' ', f.lastname) LIKE '${search_string}%' THEN 1
+            WHEN (f.firstname, ' ', f.lastname) LIKE '%${search_string}' THEN 2
+            ELSE 3
+          END`;
+
+        try{
+            const [results, fields] = await pool.query(query);
+            return results;
+        } catch(err){
+            console.log("Error executing query:" + err);
+            throw err;
+        }
+    }
+    
+
     static async register(firstname, lastname, gender, dob, mobile, address, NID_img_path, pfp_img_path, email, pass_hash) {
 
         const query = 
