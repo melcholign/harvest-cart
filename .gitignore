@@ -1,6 +1,9 @@
 # Test server
 app.test.js
 
+# Test router
+router.test.js
+
 # Logs
 logs
 *.log

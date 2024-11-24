@@ -65,10 +65,16 @@ class BasketModel {
             + 'SELECT ?, ? FROM Product '
             + 'WHERE Product.productId = ? AND Product.stockQuantity != 0';
 
-        const [result] = await pool.query(query, [customerId, productId, productId]);
+        try {
+            const [result] = await pool.query(query, [customerId, productId, productId]);
+        } catch (err) {
+            if (err.code === 'ER_DUP_ENTRY') {
+                throw new Error('product already added', { cause: 'duplicate' })
+            }
+        }
 
         if (result.affectedRows === 0) {
-            throw new Error(`unable to add product`, { cause: 'out of stock' });
+            throw new Error('unable to add product', { cause: 'out of stock' });
         }
     }
 
@@ -79,10 +85,36 @@ class BasketModel {
      * 
      * @param {Number} customerId - identifies the customer
      * @param {Number} productId - identifies the product
+     * 
+     * @throws an error when there is no product to remove
      */
     static async removeProduct(customerId, productId) {
         const query = 'DELETE FROM Basket WHERE customerId = ? AND productId = ?';
-        await pool.query(query, [customerId, productId]);
+        const [result] = await pool.query(query, [customerId, productId]);
+
+        if (result.affectedRows == 0) {
+            throw new Error('No product to remove', { cause: 'nonexistent product' });
+        }
+    }
+
+    /**
+     * @async
+     * @method getQuantity
+     * @description gets the quantity of a product in 
+     * a customer's basket
+     * 
+     * @param {Number} customerId
+     * @param {Number} productId
+     * @returns {Number} quantity - the quantity of the product in
+     * the customer's basket. Returns 0, if there is no such product in it.  
+     */
+    static async getQuantity(customerId, productId) {
+        const query = 'SELECT productQuantity FROM Basket '
+            + 'WHERE customerId = ? AND productId = ?';
+        console.time('getQuantity');
+        const [results] = await pool.query(query, [customerId, productId]);
+        console.timeEnd('getQuantity');
+        return results[0]?.productQuantity || 0;
     }
 
     /**
@@ -97,6 +129,7 @@ class BasketModel {
      * @throws an error if newQuantity < 0, and newQuantity > stockQuantity
      */
     static async setQuantity(customerId, productId, newQuantity) {
+        console.log({ customerId, productId, newQuantity });
         if (newQuantity < 0) {
             throw new Error('invalid quantity', { cause: 'negative value' });
         }
@@ -158,7 +191,11 @@ class BasketModel {
     static async clearBasket(customerId) {
         const query = 'DELETE FROM Basket WHERE customerId = ?';
 
-        await pool.query(query, [customerId]);
+        const [result] = await pool.query(query, [customerId]);
+
+        if (result.affectedRows == 0) {
+            throw new Error('Basket is already empty', { cause: 'No products in basket' });
+        }
     }
 }
 
