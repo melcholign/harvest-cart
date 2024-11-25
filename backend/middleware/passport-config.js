@@ -29,13 +29,18 @@ function initializePassport(passport, getFarmerByEmail, getFarmerByID){
     }
     passport.use(new LocalStrategy({ usernameField: 'email'}, authenticateFarmer));
     passport.serializeUser((farmer, done) => {
-        console.log("Serializing farmer:" + farmer.farmer_id);
+        console.log("Serializing farmer");
+        /*
+        console.log(farmer.farmer_id);
+        */
         done(null,farmer.farmer_id);
     });
     passport.deserializeUser(async (farmer_id, done) => {
-        console.log("Deserializing farmer: ");
+        console.log("Deserializing farmer");
+        /*
         console.log("FarmerID: " + farmer_id);
         console.log(await getFarmerByID(farmer_id));
+        */
         return done(null, await getFarmerByID(farmer_id));
     });
 } 

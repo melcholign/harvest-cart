@@ -1,6 +1,25 @@
-import { StoreModel } from "../models/StoreModel";
+import { StoreModel } from "../models/storeModel";
 
 class StoreController{
+
+
+    static async searchByName(req, res){
+        const searchString = req.body;
+
+        try{
+            searchResultList = await StoreModel.searchByName(searchString);
+
+            if(searchResultList.length == 0){
+                res.json({ message: 'No stores match your searched name.'});
+            }
+            res.json({ searchResultList });
+        } catch(err){
+            console.log(err);
+            res.json({ message: "Server error" });
+        }
+    }
+
+    /*
     static async getAll(req, res){
         try{
             const stores = await StoreModel.getAll();
@@ -14,10 +33,10 @@ class StoreController{
             return res.json({message: 'Server Error'});
         }
     }
-
+    
     static async getByID(req, res){
         const { store_id } = req.body;
-
+        
         try{
             const matchingStore = await StoreModel.getByID(store_id);
             if(!matchingStore){
@@ -30,6 +49,7 @@ class StoreController{
             return res.json({message: 'Server Error'});
         }
     }
+    */
 
     static async create(req, res){
         const { store_name, description, gallery_imgs, cover_img } = req.body;

@@ -104,20 +104,40 @@ class FarmerController{
         
 
     static async update(req, res){
-        const {firstname, lastname, gender, dob, mobile, address, nid, pfp, email, password, farmer_id} = req.body;
+        console.log('Updating:');
+        console.log(req.body);
+
+        const {firstname, lastname, gender, dob, mobile, address, nid, pfp, email, password} = req.body;
         
-        if(!(firstname && lastname && dob && mobile && address && nid && email && password && farmer_id)){
+        const thisFarmerID = req.user.farmer_id;
+        console.log('This farmers id:' + thisFarmerID);
+
+        if(!(firstname && lastname && dob && mobile && address && nid && email)){
             return res.json({ message: "All required input fields must be filled!" });
         }
-        try {
-            const existingFarmer = await FarmerModel.getByEmail(email);
 
-            if(existingFarmer) {
-                return res.status(400).json({ message: 'An account with this email already exists' });
+        try {
+            // should ideally return nothing (new email address) OR their own farmer account (same old email address)
+            const  checkFarmer = await FarmerModel.getByEmail(email);
+            console.log('checkFarmer: ' + checkFarmer);
+            if(checkFarmer && checkFarmer.farmer_id != thisFarmerID) {
+                return res.status(400).json({ message: 'This email is in use by another account!' });
             }
             
-            const hashedPassword = await bcryptjs.hash(password, 10);
-            await FarmerModel.update(firstname, lastname, gender, dob, mobile, address, nid, pfp, email, hashedPassword, farmer_id);
+            let hashedPassword;
+            if(!password){
+                // no password enterred so reinsert old password hash
+                console.log("Old pass reinserted");
+                const storeFarmer = await FarmerModel.getByID(thisFarmerID);
+                hashedPassword = storeFarmer.pass_hash;
+                console.log(hashedPassword);
+            } else {
+                // new password enterred so hash new password into db
+                console.log("Hashing new pass");
+                hashedPassword = await bcryptjs.hash(password, 10);
+            }
+
+            await FarmerModel.update(firstname, lastname, gender, dob, mobile, address, nid, pfp, email, hashedPassword, thisFarmerID);
             
             res.redirect('/farmer');
         }catch(err) {
@@ -127,10 +147,14 @@ class FarmerController{
     };
 
     static async delete(req, res){
-        const { id } = req.body;
-        
         try{
-            await FarmerModel.delete(id);
+            const storedID = req.user.farmer_id;
+            req.logout((err) => {
+                if (err) { 
+                    return next(err); 
+                }
+            });
+            await FarmerModel.delete(storedID);
             res.redirect('/farmer/register');
         }catch(err){
             console.log(err);

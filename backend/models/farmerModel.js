@@ -128,6 +128,7 @@ class FarmerModel{
 if(0){console.log(await FarmerModel.register("Person", "I", "M", "2001-10-22", "01430850152", "Sylhet", "src/imgs/farmer/NID/wejofoej.jpg", "src/imgs/farmer/pfp/fowjfoj.jpg", "personI@gmail.com", "141fwei81AEF4014080"));}
 if(0){console.log(await FarmerModel.register("Person", "II", "F", "1991-06-05", "01518530911", "Barishal", "src/imgs/farmer/NID/vwojvwow.jpg", "src/imgs/farmer/pfp/fowf32j.jpg", "personII@gmail.com", "fwojfweAEF4014080"));}
 if(0){console.log(await FarmerModel.getAll());}
+if(0){console.log(await FarmerModel.getByID(1));}
 if(0){console.log(await FarmerModel.getByEmail('abrar123@gmail.com'));}
 if(0){console.log(await FarmerModel.delete("10"));}
 if(0){console.log(await FarmerModel.update("Edited", "Person", "E", "24-02-2010", "10853581", "Chittagong", "src/imgs/farmer/NID/wejofoej.jpg", "src/imgs/farmer/pfp/fowjfoj.jpg", "farmer@gmail.com", "14103481AEF4014080", "7"));}
