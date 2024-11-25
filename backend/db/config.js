@@ -1,7 +1,7 @@
 import dotenv from 'dotenv';
 import path from 'node:path';
 
-dotenv.config({ path: path.resolve('..', '.env') });
+dotenv.config({ path: path.resolve('.', '.env') });
 
 const config = {
     connectionLimit: 10,
