@@ -1,3 +1,6 @@
+//import dotenv from 'dotenv';
+//import path from 'node:path';
+//dotenv.config({ path: path.resolve('.','.env') });
 import express from 'express';
 import cors from 'cors';
 import { sessionStore } from './middlewares/session-store.js';
