@@ -1,6 +1,7 @@
 import { BasketModel } from '../models/basket-model.js';
 import { ProductModel } from '../models/product-model.js';
 import { mapObjectsByKey } from '../utils/array-to-obj-mapper.js';
+import { pool } from '../db/pool.js';
 
 /**
  * @classdesc Controller that allows a customer to manage 
@@ -17,7 +18,7 @@ class BasketController {
      */
     static async getBasket(req, res) {
         const { customerId } = req.user;
-        let basket = await BasketModel.getBasket(customerId);
+        let basket = await BasketModel.getBasket(pool, customerId);
 
         const invalidProducts = await BasketController.#getInvalidProducts(basket);
 
@@ -26,7 +27,7 @@ class BasketController {
 
         // asynchronously update basket info
         for (let product of invalidProducts) {
-            BasketModel.setQuantity(customerId, product.id, product.stockQuantity);
+            BasketModel.setQuantity(pool, customerId, product.id, product.stockQuantity);
         }
 
         return res.json({
@@ -50,7 +51,7 @@ class BasketController {
         const { productId } = req.body;
 
         try {
-            await BasketModel.addProduct(customerId, productId);
+            await BasketModel.addProduct(pool, customerId, productId);
         } catch (err) {
             const statusCode = err.cause == 'duplicate' ? 409 : 404;
             return res.status(statusCode).json({
@@ -77,7 +78,7 @@ class BasketController {
         const { productId } = req.params;
 
         try {
-            await BasketModel.removeProduct(customerId, productId);
+            await BasketModel.removeProduct(pool, customerId, productId);
         } catch (err) {
             // if there is NO such product in the customer's basket to remove
             return res.status(404).json({
@@ -116,7 +117,7 @@ class BasketController {
 
         const { customerId } = req.user;
         const { productId } = req.params;
-        const currentQuantity = await BasketModel.getQuantity(customerId, productId);
+        const currentQuantity = await BasketModel.getQuantity(pool, customerId, productId);
 
         if (currentQuantity == 0) {
             return res.status(404).json({
@@ -128,7 +129,7 @@ class BasketController {
 
         const newQuantity = currentQuantity + (operation == 'increment' ? 1 : -1);
         try {
-            await BasketModel.setQuantity(customerId, productId, newQuantity);
+            await BasketModel.setQuantity(pool, customerId, productId, newQuantity);
         } catch (err) {
             return res.status(400).json({
                 currentQuantity,
@@ -155,7 +156,7 @@ class BasketController {
         const { customerId } = req.user;
 
         try {
-            await BasketModel.clearBasket(customerId);
+            await BasketModel.clearBasket(pool, customerId);
         } catch (err) {
             // if the basket is ALREADY EMPTY
             return res.status(404).json({
@@ -171,7 +172,7 @@ class BasketController {
 
     static async proceedToCheckout(req, res) {
         const { customerId } = req.user;
-        const basket = await BasketModel.getBasket(customerId);
+        const basket = await BasketModel.getBasket(pool, customerId);
 
         if (basket.length == 0) {
             return res.status(404).json({
