@@ -23,14 +23,11 @@ farmerRouter.post('/login', checkNotAuthenticated, passport.authenticate('local-
 farmerRouter.get('', checkAuthenticated, (req, res) => {
   res.render('index.ejs', { name: req.user.firstname + " " + req.user.lastname })
 })
-
 farmerRouter.get('/update', checkAuthenticated, (req, res) => {
   res.render('updateFarmer.ejs', { farmer: req.user });
 })
 farmerRouter.post('/update', checkAuthenticated, FarmerController.update);
-
 farmerRouter.post('/delete', checkAuthenticated, FarmerController.delete);
-
 farmerRouter.post("/logout", (req, res) => {
   req.logout((err) => {
     if (err) { return next(err); }

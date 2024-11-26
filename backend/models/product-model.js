@@ -120,20 +120,6 @@ class ProductModel {
         }
     }
 
-    static async getByStore(store_id){
-        const query =
-        `SELECT *
-        FROM product p
-        WHERE p.store_id = ${store_id};`;
-
-        try{
-            const [results, fields] = await pool.query(query);
-            return results;
-        } catch(err){
-            console.log("Error executing query:" + err);
-            throw err;
-        }
-    }
 
     static async add(store_id, category_id ,product_name, description, price, thumbnail_img_path){
         const query =

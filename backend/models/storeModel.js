@@ -59,16 +59,17 @@ class StoreModel {
         }
     }
 
-    static async getByFarmer(farmer_id) {
+    
+    static async getProducts(store_id){
         const query =
-            `SELECT *
-        FROM store s
-        WHERE s.farmer_id = ${farmer_id};`;
+        `SELECT *
+        FROM product p
+        WHERE p.store_id = ${store_id};`;
 
-        try {
+        try{
             const [results, fields] = await pool.query(query);
             return results;
-        } catch (err) {
+        } catch(err){
             console.log("Error executing query:" + err);
             throw err;
         }

@@ -93,6 +93,22 @@ class FarmerModel {
         }
     }
 
+    static async getStores(farmer_id) {
+        const query =
+        `SELECT *
+        FROM store s
+        WHERE s.farmer_id = ${farmer_id};`;
+
+        try {
+            const [results, fields] = await pool.query(query);
+            return results;
+        } catch (err) {
+            console.log("Error executing query:" + err);
+            throw err;
+        }
+    }
+
+
 
     static async register(firstname, lastname, gender, dob, mobile, address, NID_img_path, pfp_img_path, email, pass_hash) {
 
