@@ -27,7 +27,7 @@ class BasketModel {
      * @async
      * @method getBasket
      * @description retrieve a customer's basket of products 
-     * that they intend to ord
+     * that they intend to order
      * 
      * @param {mysql.Connection} connection - database connection
      * @param {Number} customerId - identifies the customer 

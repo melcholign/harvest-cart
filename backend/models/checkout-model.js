@@ -1,5 +1,5 @@
 /**
- * @module BasketModel
+ * @module checkout-module.js
  */
 
 import { pool } from '../db/pool.js';
@@ -83,7 +83,7 @@ class CheckoutModel {
             await connection.query(createSessionQuery, [customerId]);
         } catch (err) {
             throw new Error('Checkout session already exists', {
-                cause: 'Duplicate customer ID'
+                cause: 'Duplicate customer ID',
             });
         }
 
@@ -102,6 +102,21 @@ class CheckoutModel {
             + placeholderTuples.join(',');
 
         await connection.query(insertItemsQuery, flattenedBasketItems);
+    }
+
+    /**
+     * Retrieves customer's checkout session information
+     * 
+     * @param {mysql.Connection} connection - Database connection. 
+     * @param {Number} customerId - Identifies customer's checkout session. 
+     * @returns {Object} - Contains customer's ID (session identifier), 
+     * their shipping address, and the payment ID
+     */
+    static async getSession(connection, customerId) {
+        const getQuery = 'SELECT * FROM Checkout WHERE customerId = ?';
+        const [results] = await connection.query(getQuery, [customerId]);
+        
+        return results[0];
     }
 
     /**
@@ -235,7 +250,7 @@ class CheckoutModel {
 // console.log(await CheckoutModel.createSession(pool, 1, basketItems));
 // console.log(await CheckoutModel.abortSession(pool, 1));
 // await CheckoutModel.setPaymentId(pool, 1, 3);
-console.log(await CheckoutModel.settleSession(pool, 1));
+// console.log(await CheckoutModel.settleSession(pool, 1));
 
 export {
     CheckoutModel,

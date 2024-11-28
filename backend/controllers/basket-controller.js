@@ -170,7 +170,7 @@ class BasketController {
         return res.status(204);
     }
 
-    static async proceedToCheckout(req, res) {
+    static async proceedToCheckout(req, res, next) {
         const { customerId } = req.user;
         const basket = await BasketModel.getBasket(pool, customerId);
 
@@ -190,10 +190,6 @@ class BasketController {
                 error: 'invalid products',
             });
         }
-
-        // TO-DO: reserve basket products for checkout
-
-        res.status(200);
     }
 
     /**
