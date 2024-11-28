@@ -18,16 +18,6 @@ CREATE TABLE IF NOT EXISTS Payment (
 
 await loadSchema(pool, paymentSchema, 'Payment');
 
-const onlineTransactionSchema = `
-CREATE TABLE IF NOT EXISTS OnlineTransaction (
-    paymentId INT NOT NULL,
-    transactionId VARCHAR(255) NOT NULL,
-
-    PRIMARY KEY(paymentId, transactionId),
-    FOREIGN KEY(paymentId) REFERENCES Payment(paymentId)
-)
-`;
-
 class PaymentModel {
 
     static PAYMENT_METHODS = {
@@ -62,7 +52,6 @@ class PaymentModel {
 
         if (result.affectedRows === 0) {
             const payment = await PaymentModel.getPaymentInformation(connection, paymentId);
-            console.log(payment);
 
             if (payment.paymentStatus === 'refund') {
                 throw new Error('payment was refunded');
@@ -74,43 +63,9 @@ class PaymentModel {
         }
     }
 
-    static async processDigitalPayment(connection, paymentId, card, paymentProcessor) {
-        try {
-            const transactionId = await paymentProcessor.process(card);
-            await PaymentModel.#createOnlineTransaction(connection, paymentId, transactionId);
-        } catch (err) {
-            throw err;
-        }
-
-        await makePayment(connection, paymentId);
-    }
-
     static async refund(connection, paymentId, paymentProcessor) {
-        try {
-            const transactionId = await PaymentModel.#getOnlineTransactionId(paymentId);
-            await paymentProcessor.refund(transactionId);
-        } catch (err) {
-            throw err;
-        }
-
-        const refundQuery = 'UPDATE Payment SET paymentStatus = \'refund\' WHERE paymentId = ?';
-        await connection.query(refundQuery, [paymentId]);
-    }
-
-    static async #getOnlineTransactionId(connection, paymentId) {
-        const getQuery = 'SELECT transactionId FROM OnlineTransaction WHERE paymentId = ?';
-        const [results] = connection.query(getQuery, [paymentId]);
-
-        if (results.length === 0) {
-            throw new Error('no online transaction has been made');
-        }
-
-        return results[0].transactionId;
-    }
-
-    static async #createOnlineTransaction(connection, paymentId, transactionId) {
-        const createQuery = 'INSERT INTO OnlineTransaction(paymentId, transactionId) VALUES (?, ?)';
-        await connection.query(createQuery, [paymentId, transactionId]);
+        const refundQuery = 'UPDATE Payment SET paymentStatus = ? WHERE paymentId = ? AND paymentMethod = ?';
+        await connection.query(refundQuery, ['refund', paymentId, 'digital']);
     }
 }
 
