@@ -1,6 +1,7 @@
 import express from 'express';
 import { FarmerController } from '../controllers/farmerController.js';
 import { passport } from '../middlewares/passport/passport-config.js';
+import { FarmerModel } from '../models/farmerModel.js';
 
 const farmerRouter = express.Router();
 
@@ -20,8 +21,11 @@ farmerRouter.post('/login', checkNotAuthenticated, passport.authenticate('local-
 }));
 
 // Protected routes
-farmerRouter.get('', checkAuthenticated, (req, res) => {
-  res.render('index.ejs', { name: req.user.firstname + " " + req.user.lastname })
+farmerRouter.get('', checkAuthenticated, async (req, res) => {
+  console.log(await FarmerModel.getStores(req.user.farmer_id));
+  res.render('index.ejs', { name: req.user.firstname + " " + req.user.lastname,
+    stores: await FarmerModel.getStores(req.user.farmer_id)
+  })
 })
 farmerRouter.get('/update', checkAuthenticated, (req, res) => {
   res.render('updateFarmer.ejs', { farmer: req.user });

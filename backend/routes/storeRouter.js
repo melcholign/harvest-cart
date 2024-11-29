@@ -1,27 +1,46 @@
-import { express } from 'express';
-import { multer } from 'multer';
+import express from 'express';
+import { StoreController } from '../controllers/storeController.js';
 
 const storeRouter = express.Router();
 
-// Configure multer for storing files in the disk at specified path(../src/cover_imgs) with specified filename(savedImage) and extension (.png)
-const storage = multer.diskStorage({
-  destination: function (req, file, cb) {
+// Protected routes
+storeRouter.get('/add', checkAuthenticated, (req, res) => {
+  res.render("storeAdd.ejs");
+})
+storeRouter.post('/add', checkAuthenticated, StoreController.add);
+storeRouter.get('/update', checkAuthenticated, (req, res) => {
+  res.render('updateStore.ejs', { store: req.user });
+})
+storeRouter.post('', checkAuthenticated, StoreController.enterStore);
+//storeRouter.post('/update', checkAuthenticated, StoreController.update);
+//storeRouter.post('/delete', checkAuthenticated, StoreController.delete);
 
-    const uniqueFolder = req.
 
-    cb(null, '../src/imgs/farmer/store')
-  },
-  filename: function (req, file, cb) {
-    const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9)
-    cb(null, file.fieldname + '-' + uniqueSuffix + '.jpg')
+// middlewares
+function checkAuthenticated(req, res, next) {
+  if (req.isAuthenticated()) {
+    return next();
   }
-})
-const upload = multer({ storage: storage })
+  res.redirect('/farmer/login');
+}
 
- 
-storeRouter.post("/create", upload.array(
-    [   { name: 'cover_img', maxCount: 1}, 
-        { name: 'gallery_imgs', maxCount: 15}   ]), 
-    (req, res, next) => {
-        const cover_img_path = req.files['cover_img'][0].destination + '/' + req.files['cover_img'][0].filename;
-})
+/*
+async function checkOwnership(req, res, next){
+  try{
+      const store = await StoreModel.getByID(req.body.storeId);
+      if(!store){
+        return res.json({ message: 'No store with such ID. '});
+      }
+      if(store.farmer_id != req.user.farmer_id){
+          return res.json({ message: 'Access denied!'});
+      }
+      res.locals.store = store;
+      return next();
+  }catch(err){
+      console.log(err);
+      return res.json({message: 'Server Error'});
+  }
+}
+*/
+
+export { storeRouter };

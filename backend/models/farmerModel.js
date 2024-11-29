@@ -1,6 +1,6 @@
 import { pool } from '../db/pool.js';
-import { loadSchema } from '../utils/schema-loader.js';
 
+/* //STUPID CODE RUNS IN PHPMYADMIN BUT throws <<<DUMB>>> "sYnTAx ErRoR" WHEN RUNNING THROUGH POOL.QUERY AAAAAAAAAAAAAAAAAAAHHHHHHHHHHHH
 const schema =
     `
 CREATE TABLE IF NOT EXISTS farmer(
@@ -18,13 +18,34 @@ CREATE TABLE IF NOT EXISTS farmer(
     email varchar(50) NOT NULL UNIQUE,
     pass_hash varchar(255) NOT NULL,
 
-    date_created TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    date_updated TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    dateCreated TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    dateUpdated TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
 
     PRIMARY KEY(farmer_id)
 );
+
+CREATE TABLE IF NOT EXISTS store(
+    storeId int NOT NULL AUTO_INCREMENT,
+    farmer_id int NOT NULL,
+
+    store_name varchar(50) NOT NULL,
+    rating float,
+    is_open BOOLEAN NOT NULL,
+    description varchar(5000),
+    gallery_imgs_path varchar(255),
+    cover_img_path varchar(255),
+
+    dateCreated TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    dateUpdated TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+
+    PRIMARY KEY(storeId),
+    FOREIGN KEY(farmer_id) REFERENCES farmer(farmer_id)
+);
 `
-loadSchema(pool, schema, 'Farmer');
+await pool.query(schema);
+*/
+
+
 
 class FarmerModel {
     static async getAll() {

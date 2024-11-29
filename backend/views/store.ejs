@@ -1,0 +1,30 @@
+<h1><%= store.store_name %></h1>
+<h2><%= store.description %></h2>
+
+<% if(store.is_open){ %>
+    <h3>Status: Open</h3>
+<% } else { %>
+    <h3>Status: Closed</h3>
+<% } %>
+
+<h3>Current rating: <%= store.rating %></h3>
+<h3>Cover Image: <%= store.cover_img_path %></h3>
+<h3>Gallery Images: <%= store.gallery_imgs_path %></h3>
+
+<form action="/farmer/store/product/<%= store.storeId%>/add" method="GET">
+  <button type="submit">Add Product</button>
+</form>
+
+
+<% for(let i = 0; i < products.length; i++){ %>
+    <h3><%= i %>. product name:<%= products[i].productName %>  Rating:<%= products[i].rating %>    In stock:<%= products[i].stockQuantity %>  Price:<%= products[i].price %></h3>
+    <form action="/farmer/store/product" method="POST">
+      <input type="text" name="productId" value=<%= products[i].productId %> hidden>
+      <input type="text" name="storeId" value=<%= store.storeId %> hidden>
+      <button type="submit">Check</button>
+    </form>
+    <hr>
+  <% } %>
+
+
+<a href="/farmer">Return</a>

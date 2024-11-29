@@ -10,9 +10,9 @@
   </div>
   <div>
     <label for="female">Female</label>
-    <input type="radio" id="female" name="gender" value="female" checked=<%= (farmer.gender == 'female') ? 'checked' : '' ;%> >
+    <input type="radio" id="female" name="gender" value="female" <% if(farmer.gender == 'female'){ %> <%= 'checked' %> <% } %> >
     <label for="male">Male</label>
-    <input type="radio" id="male" name="gender" value="male" checked=<%= (farmer.gender == 'male') ? 'checked' : '' ;%>>
+    <input type="radio" id="male" name="gender" value="male" <% if(farmer.gender == 'male'){ %> <%= 'checked' %> <% } %> >
   </div>
   <div>
     <label for="dob">Date of birth</label>
@@ -24,7 +24,7 @@
   </div>
   <div>
     <label for="address">address</label>
-    <input type="text" id="address" name="address" value=<%=farmer.address %> required>
+    <textarea id="address" name="address" required><%=farmer.address %></textarea>
   </div>
   <div>
     <label for="nid">nid</label>

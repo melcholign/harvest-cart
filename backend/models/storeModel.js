@@ -1,5 +1,27 @@
 import { pool } from '../db/pool.js';
 
+const schema = 
+`
+CREATE TABLE IF NOT EXISTS store(
+    storeId int NOT NULL AUTO_INCREMENT,
+    farmer_id int NOT NULL,
+
+    store_name varchar(50) NOT NULL,
+    rating float,
+    is_open BOOLEAN NOT NULL,
+    description varchar(5000),
+    gallery_imgs_path varchar(255),
+    cover_img_path varchar(255),
+
+    dateCreated TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    dateUpdated TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+
+    PRIMARY KEY(storeId),
+    FOREIGN KEY(farmer_id) REFERENCES farmer(farmer_id)
+);
+`
+await pool.query(schema);
+
 class StoreModel {
     static async getAll() {
         const query =
@@ -46,7 +68,7 @@ class StoreModel {
         const query =
             `SELECT *
         FROM store s
-        INNER JOIN product p ON s.store_id = p.store_id
+        INNER JOIN product p ON s.storeId = p.storeId
         WHERE ${conditionString}
         ORDER BY s.rating DESC;`
 
@@ -60,11 +82,11 @@ class StoreModel {
     }
 
     
-    static async getProducts(store_id){
+    static async getProducts(storeId){
         const query =
         `SELECT *
         FROM product p
-        WHERE p.store_id = ${store_id};`;
+        WHERE p.storeId = ${storeId};`;
 
         try{
             const [results, fields] = await pool.query(query);
@@ -75,11 +97,11 @@ class StoreModel {
         }
     }
 
-    static async getByID(store_id) {
+    static async getByID(storeId) {
         const query =
             `SELECT *
         FROM store s
-        WHERE s.store_id = ${store_id};`;
+        WHERE s.storeId = ${storeId};`;
 
         try {
             const [results, fields] = await pool.query(query);
@@ -90,7 +112,7 @@ class StoreModel {
         }
     }
 
-    static async create(farmer_id, store_name, description, gallery_imgs_path, cover_img_path) {
+    static async add(farmer_id, store_name, description, gallery_imgs_path, cover_img_path) {
         const query =
             `INSERT INTO store (farmer_id, store_name, description, gallery_imgs_path, cover_img_path)
         VALUES ('${farmer_id}', '${store_name}', '${description}', '${gallery_imgs_path}', '${cover_img_path}');`;
@@ -105,14 +127,14 @@ class StoreModel {
     }
 
 
-    static async update(store_id, store_name, description, gallery_imgs_path, cover_img_path) {
+    static async update(storeId, store_name, description, gallery_imgs_path, cover_img_path) {
         const query =
             `UPDATE store
          SET store_name = '${store_name}',
              description = '${description}',
              gallery_imgs_path = '${gallery_imgs_path}',
              cover_img_path = '${cover_img_path}'
-         WHERE store_id = ${store_id};`;
+         WHERE storeId = ${storeId};`;
 
         try {
             const [results, fields] = await pool.query(query);
@@ -123,10 +145,10 @@ class StoreModel {
         }
     }
 
-    static async delete(store_id) {
+    static async delete(storeId) {
         const query =
             `DELETE FROM store
-         WHERE store_id = ${store_id};`
+         WHERE storeId = ${storeId};`
 
         try {
             const [results, fields] = await pool.query(query);

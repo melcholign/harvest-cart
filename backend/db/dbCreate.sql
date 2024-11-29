@@ -17,34 +17,34 @@ CREATE TABLE farmer(
     email varchar(50) NOT NULL UNIQUE,
     pass_hash varchar(1024) NOT NULL,
 
-    date_created TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    date_updated TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    dateCreated TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    dateUpdated TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
 
     PRIMARY KEY(farmer_id)
 );
 
 CREATE table store(
-    store_id int NOT NULL AUTO_INCREMENT,
+    storeId int NOT NULL AUTO_INCREMENT,
     farmer_id int NOT NULL,
 
     store_name varchar(50) NOT NULL,
-    rating float,
-    is_open BOOLEAN NOT NULL,
-    description varchar(5000),
-    gallery_imgs_path varchar(255),
-    cover_img_path varchar(255),
+    rating float NULL,
+    is_open BOOLEAN NOT NULL DEFAULT 0,
+    description varchar(5000) NULL,
+    gallery_imgs_path varchar(255) UNIQUE,
+    cover_img_path varchar(255) UNIQUE,
 
-    date_created TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    date_updated TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    dateCreated TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    dateUpdated TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
 
-    PRIMARY KEY(store_id),
+    PRIMARY KEY(storeId),
     FOREIGN KEY(farmer_id) REFERENCES farmer(farmer_id)
 );
 
 
 CREATE table product(
-    product_id int NOT NULL AUTO_INCREMENT,
-    store_id int NOT NULL,
+    productId int NOT NULL AUTO_INCREMENT,
+    storeId int NOT NULL,
     /*
     category_id int NOT NULL,
     */
@@ -53,19 +53,19 @@ CREATE table product(
                     'Poultry', 'Seafood', 'Red Meat', 'Fish',
                     'Grains', 'Condiments', 'Spices & Seasonings'),
     
-    product_name varchar(50) NOT NULL,
+    productName varchar(50) NOT NULL,
     description varchar(1000),
     rating double(3,2),
-    stock_quantity int,
+    stockQuantity int,
     price float,
 
-    thumbnail_img_path varchar(255),
+    thumbnailImgPath varchar(255),
 
-    date_created TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    date_updated TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    dateCreated TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    dateUpdated TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
 
-    PRIMARY KEY(product_id),
-    FOREIGN KEY(store_id) REFERENCES store(store_id)
+    PRIMARY KEY(productId),
+    FOREIGN KEY(storeId) REFERENCES store(storeId)
 );
 
 CREATE table customer(
@@ -77,17 +77,17 @@ CREATE table customer(
 
 CREATE table rating(
     rating_id int NOT NULL AUTO_INCREMENT,
-    product_id int NOT NULL,
+    productId int NOT NULL,
     customer_id int NOT NULL,
 
     rating int NOT NULL,
     comment varchar(1500) NULL,
     
-    date_created TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    date_updated TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    dateCreated TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    dateUpdated TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
 
     PRIMARY KEY(rating_id),
-    FOREIGN KEY(product_id) REFERENCES product(product_id),
+    FOREIGN KEY(productId) REFERENCES product(productId),
     FOREIGN KEY(customer_id) REFERENCES customer(customer_id)
 );
 

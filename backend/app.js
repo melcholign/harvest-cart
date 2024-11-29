@@ -9,6 +9,8 @@ import { passport } from './middlewares/passport/passport-config.js';
 import { customerRouter } from './routes/customer-router.js';
 import { basketRouter } from './routes/basket-router.js';
 import { farmerRouter } from './routes/farmerRouter.js';
+import { storeRouter } from './routes/storeRouter.js';
+import { productRouter } from './routes/productRouter.js';
 
 const app = express();
 app.set('view engine', 'ejs')
@@ -23,6 +25,8 @@ app.use(flash());
 app.use('/customer', customerRouter);
 app.use('/customer/basket', basketRouter);
 app.use('/farmer', farmerRouter);
+app.use('/farmer/store', storeRouter);
+app.use('/farmer/store/product', productRouter);
 
 app.get('/', (req, res) => {
     console.log(req.user);

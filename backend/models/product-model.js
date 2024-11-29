@@ -5,7 +5,7 @@ const schema =
     `
 CREATE TABLE IF NOT EXISTS Product (
     productId INT NOT NULL AUTO_INCREMENT,
-    -- storeId INT NOT NULL,
+    storeId INT NOT NULL,
 
     productName VARCHAR(50) NOT NULL,
     description VARCHAR(1000),
@@ -80,12 +80,12 @@ class ProductModel {
         const query =
         `SELECT *
         FROM product p
-        WHERE p.product_name LIKE '%${search_string}%'
+        WHERE p.productName LIKE '%${search_string}%'
         ORDER BY
           CASE
-            WHEN p.product_name LIKE '${search_string}' THEN 0
-            WHEN p.product_name LIKE '${search_string}%' THEN 1
-            WHEN p.product_name LIKE '%${search_string}' THEN 2
+            WHEN p.productName LIKE '${search_string}' THEN 0
+            WHEN p.productName LIKE '${search_string}%' THEN 1
+            WHEN p.productName LIKE '%${search_string}' THEN 2
             ELSE 3
           END`;
 
@@ -121,10 +121,10 @@ class ProductModel {
     }
 
 
-    static async add(store_id, category_id ,product_name, description, price, thumbnail_img_path){
+    static async add(storeId, category ,productName, description, price, thumbnailImgPath){
         const query =
-        `INSERT INTO product (store_id, category_id ,product_name, description, price, thumbnail_img_path)
-        VALUES ('${store_id}', '${category_id}', '${product_name}', '${description}', '${price}', '${thumbnail_img_path}');`;
+        `INSERT INTO product (storeId, category ,productName, description, price, thumbnailImgPath)
+        VALUES ('${storeId}', '${category}', '${productName}', '${description}', '${price}', '${thumbnailImgPath}');`;
 
         try{
             const [results, fields] = await pool.query(query);
@@ -136,16 +136,16 @@ class ProductModel {
     }
 
 
-    static async update(product_id, store_id, category_id ,product_name, description, price){
-        // NOTE: no parameter for thumbnail_img_path as path remains same, just img on path is replaced by controller
+    static async update(productId, storeId, category_id ,productName, description, price){
+        // NOTE: no parameter for thumbnailImgPath as path remains same, just img on path is replaced by controller
         const query =
         `UPDATE product
-         SET store_id = '${store_id}',
+         SET storeId = '${storeId}',
              category_id = '${category_id}',
-             product_name = '${product_name}',
+             productName = '${productName}',
              description = '${description}',
              price = '${price}'
-         WHERE product_id = ${product_id};`;
+         WHERE productId = ${productId};`;
 
          try{
             const [results, fields] = await pool.query(query);
@@ -156,10 +156,10 @@ class ProductModel {
         }
     }
 
-    static async delete(product_id){
+    static async delete(productId){
         const query =
         `DELETE FROM product
-         WHERE product_id = ${product_id};`
+         WHERE productId = ${productId};`
 
          try{
             const [results, fields] = await pool.query(query);

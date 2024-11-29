@@ -10,3 +10,16 @@
 <form action="/farmer/update" method="GET">
   <button type="submit">Edit</button>
 </form>
+
+<form action="/farmer/store/add" method="GET">
+  <button type="submit">Add Store</button>
+</form>
+
+<% for(let i = 0; i < stores.length; i++){ %>
+  <h3><%= i %>. Name:<%= stores[i].store_name %>  Rating:<%= stores[i].rating %> Open:<%= stores[i].is_open %></h3>
+  <form action="/farmer/store" method="POST">
+    <input type="text" name="storeId" value=<%= stores[i].storeId %> hidden>
+    <button type="submit">Check</button>
+  </form>
+  <hr>
+<% } %>

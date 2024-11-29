@@ -1,13 +1,14 @@
-import { StoreModel } from "../models/storeModel.js";
-import { FarmerModel } from "../models/farmerModel.js";
 import { ProductModel } from "../models/product-model.js";
+import { FarmerModel } from "../models/farmerModel.js";
+import { StoreModel } from "../models/storeModel.js";
+import { StoreController } from "./storeController.js";
 
-class StoreController{
+class ProductController{
     static async searchByName(req, res){
         const searchString = req.body;
 
         try{
-            searchResultList = await StoreModel.searchByName(searchString);
+            searchResultList = await ProductModel.searchByName(searchString);
 
             if(searchResultList.length == 0){
                 res.json({ message: 'No stores match your searched name.'});
@@ -52,51 +53,33 @@ class StoreController{
     */
 
     static async add(req, res){
-        const { store_name, description, gallery_imgs, cover_img } = req.body;
-        const farmer_id = req.user.farmer_id;
+        const { productName, category, description, price, thumbnailImg, storeId } = req.body;
 
-        if(!store_name){
+        if(!(productName && category && price && thumbnailImg)){
             return res.json({ message: 'All required input fields must be filled!'});
         }
 
-        const storesOfFarmer = await FarmerModel.getStores(farmer_id);
-        console.log(storesOfFarmer);
-        for(let x of storesOfFarmer){
-            if(x.store_name == store_name){
-                return res.json({ message: "Farmer already has a store with such name." });
+        const productsOfFarmer = await StoreModel.getProducts(storeId);
+        console.log(productsOfFarmer);
+        for(let x of productsOfFarmer){
+            if(x.productName == productName){
+                return res.json({ message: "Store already has a products with such name." });
             }
         }
 
         try{
-            await StoreModel.add(farmer_id, store_name, description, gallery_imgs, cover_img);
-            return res.redirect('/farmer');
+            await ProductModel.add(storeId, category, productName, description, price, thumbnailImg);
+            return StoreController.enterStore(req, res);
         }catch(err){
             console.log(err);
             return res.json({message: 'Server Error'});
         }
     }
 
-    static async enterStore(req, res){
-        try{
-            const store = await StoreModel.getByID(req.body.storeId);
-            
-            // some access restriction in case post request body is altered by attackers
-            if(store.farmer_id != req.user.farmer_id){
-                return res.json({ message: 'Access denied!'});
-            }
 
-            res.render('store.ejs', {
-                store: store,
-                products: await StoreModel.getProducts(req.body.storeId)
-            });
-        }catch(err){
-            console.log(err);
-            return res.json({message: 'Server Error'});
-        }
-    }
 
     
 
 }
 
-export { StoreController };
+export { ProductController };
