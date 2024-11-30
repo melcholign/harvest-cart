@@ -225,8 +225,6 @@ class ProductModel {
     }
 }
 
-ProductModel.decreaseStock(pool, 1, 20).catch(err => console.log(err));
-
 export {
     ProductModel,
 }

@@ -3,5 +3,7 @@ export function isAuthenticated(req, res, next) {
         return next();
     }
 
-    return res.sendStatus(401);
+    return res.status(401).json({
+        error: 'customer must log in to access this feature',
+    });
 }

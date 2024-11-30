@@ -8,6 +8,7 @@ import { sessionStore } from './middlewares/session-store.js';
 import { passport } from './middlewares/passport/passport-config.js';
 import { customerRouter } from './routes/customer-router.js';
 import { basketRouter } from './routes/basket-router.js';
+import { checkoutRouter } from './routes/checkout-router.js';
 import { farmerRouter } from './routes/farmerRouter.js';
 
 const app = express();
@@ -22,11 +23,14 @@ app.use(flash());
 
 app.use('/customer', customerRouter);
 app.use('/customer/basket', basketRouter);
+app.use('/customer/checkout', checkoutRouter);
 app.use('/farmer', farmerRouter);
 
 app.get('/', (req, res) => {
     console.log(req.user);
-    res.send('Hello');
+    res.json({
+        message: 'Hello',
+    });
 });
 
 const PORT = process.env.PORT || 3000;

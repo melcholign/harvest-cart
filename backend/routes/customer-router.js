@@ -7,9 +7,9 @@ import { isAuthenticated } from '../middlewares/is-authenticated.js';
 
 const router = express.Router();
 
-router.post('/account/create', createCustomerValidator(), CustomerController.createCustomer);
-router.get('/account/verify', isAuthenticated, VerificationController.initiateAccountVerification);
-router.post('/account/verify', isAuthenticated, VerificationController.completeAccountVerification);
+router.post('/account', createCustomerValidator(), CustomerController.createCustomer);
+router.get('/account/verification', isAuthenticated, VerificationController.initiateAccountVerification);
+router.post('/account/verification', isAuthenticated, VerificationController.completeAccountVerification);
 
 router.post('/account/login',
     passport.authenticate('local-customer', { successRedirect: '/', failureRedirect: '/' }),

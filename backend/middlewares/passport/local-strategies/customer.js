@@ -10,6 +10,7 @@ async function authenticateCustomer(email, password, done) {
         }
 
         const isCorrectPassword = await bcrypt.compare(password, customer.hashedPassword);
+        console.log(isCorrectPassword)
 
         if (!isCorrectPassword) {
             return done(null, false, { message: 'Incorrect password.' });

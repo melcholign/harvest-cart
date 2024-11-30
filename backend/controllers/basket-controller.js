@@ -30,8 +30,6 @@ class BasketController {
             BasketModel.setQuantity(pool, customerId, product.id, product.stockQuantity);
         }
 
-        console.log(basket, invalidProducts);
-
         return res.json({
             basket,
             changes: invalidProducts,

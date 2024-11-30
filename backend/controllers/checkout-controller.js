@@ -69,13 +69,11 @@ class CheckoutController {
         const connection = await pool.getConnection();
         await connection.beginTransaction();
 
-        
-
         const checkoutItems = await CheckoutModel.abortSession(connection, customerId);
 
         for (let item of checkoutItems) {
             await BasketModel.addProduct(connection, customerId, item.productId);
-            await BasketModel.setQuantity(connection, customerId, item.productId, item.productQuantity - 1);
+            await BasketModel.setQuantity(connection, customerId, item.productId, item.productQuantity);
             await ProductModel.increaseStock(connection, item.productId, item.productQuantity);
         }
 
