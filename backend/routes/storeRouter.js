@@ -1,5 +1,44 @@
 import express from 'express';
 import { StoreController } from '../controllers/storeController.js';
+import { StoreModel } from '../models/storeModel.js';
+import fs from 'fs';
+
+// configuring multer
+import multer from 'multer';
+const storage = multer.diskStorage({
+    destination: function(req, file, cb){
+      let path;
+      if(file.fieldname == 'cover'){
+        path = 'src/farmer/' + req.user.farmer_id + '/store/' + req.body.store_name + '/';
+      } else if(file.fieldname == 'gallery'){
+        path = 'src/farmer/' + req.user.farmer_id + '/store/' + req.body.store_name + '/gallery/';
+        if(req.galleryImgCounter == 0 && fs.existsSync(path)){
+          fs.rmSync(path, { recursive: true, force: true });;
+        }
+      } else{
+        console.log('File fieldnames not matching for store image fields! NOTE: views file input tags name attribute should be gallery and cover');
+      }
+
+      // if path does not exist, create the path
+      if(!fs.existsSync(path)){
+        fs.mkdirSync(path, { recursive: true });
+      }
+      
+      cb(null, path);
+    },
+    filename: function(req, file, cb){
+        if(file.fieldname == 'cover'){
+          cb(null, 'cover.jpg');
+        } else if(file.fieldname == 'gallery'){
+          //const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1e9);
+          cb(null, (req.galleryImgCounter++) + '.jpg');
+        } else{
+          console.log('File fieldnames not matching for store image fields! NOTE: views file input tags name attribute should be gallery and cover');
+        }
+    }
+});
+const upload = multer( {storage: storage} );
+const imageUpload = upload.fields([{ name: 'cover', maxCount: 1 }, { name: 'gallery', maxCount: 8 }])
 
 const storeRouter = express.Router();
 
@@ -7,13 +46,16 @@ const storeRouter = express.Router();
 storeRouter.get('/add', checkAuthenticated, (req, res) => {
   res.render("storeAdd.ejs");
 })
-storeRouter.post('/add', checkAuthenticated, StoreController.add);
-storeRouter.get('/update', checkAuthenticated, (req, res) => {
-  res.render('updateStore.ejs', { store: req.user });
+storeRouter.post('/add', checkAuthenticated, setGalleryImgCounter, imageUpload, StoreController.add);
+
+
+//dynamic routes
+storeRouter.get('/:storeId/update', checkAuthenticated, checkOwnership, (req, res) => {
+  res.render('updateStore.ejs', { store: res.locals.store });
 })
-storeRouter.post('', checkAuthenticated, StoreController.enterStore);
-//storeRouter.post('/update', checkAuthenticated, StoreController.update);
-//storeRouter.post('/delete', checkAuthenticated, StoreController.delete);
+storeRouter.post('/:storeId/update', checkAuthenticated, checkOwnership, setGalleryImgCounter, imageUpload, StoreController.update);
+//storeRouter.post('/:storeId/delete', checkAuthenticated, StoreController.delete);
+storeRouter.get('/:storeId', checkAuthenticated, checkOwnership, StoreController.enterStore);
 
 
 // middlewares
@@ -24,10 +66,9 @@ function checkAuthenticated(req, res, next) {
   res.redirect('/farmer/login');
 }
 
-/*
 async function checkOwnership(req, res, next){
   try{
-      const store = await StoreModel.getByID(req.body.storeId);
+      const store = await StoreModel.getByID(req.params.storeId);
       if(!store){
         return res.json({ message: 'No store with such ID. '});
       }
@@ -41,6 +82,10 @@ async function checkOwnership(req, res, next){
       return res.json({message: 'Server Error'});
   }
 }
-*/
+
+function setGalleryImgCounter(req, res, next){
+  req.galleryImgCounter = 0;
+  return next();
+}
 
 export { storeRouter };

@@ -53,26 +53,29 @@ class ProductController{
     */
 
     static async add(req, res){
-        const { productName, category, description, price, thumbnailImg, storeId } = req.body;
+        const { productName, category, description, price } = req.body;
 
-        if(!(productName && category && price && thumbnailImg)){
+        if(!(productName && category && price)){
             return res.json({ message: 'All required input fields must be filled!'});
         }
 
-        const productsOfFarmer = await StoreModel.getProducts(storeId);
-        console.log(productsOfFarmer);
-        for(let x of productsOfFarmer){
-            if(x.productName == productName){
-                return res.json({ message: "Store already has a products with such name." });
-            }
-        }
+        const thumbnailImgPath = 'src/farmer/' + req.user.farmer_id + '/store/' + req.body.store_name + '/product/' + req.body.productName + '.jpg';
 
         try{
-            await ProductModel.add(storeId, category, productName, description, price, thumbnailImg);
-            return StoreController.enterStore(req, res);
-        }catch(err){
+            await ProductModel.add(req.params.storeId, category, productName, description, price, thumbnailImgPath);
+            return res.redirect('/farmer/store/' + req.params.storeId);
+        }catch(err) {
+            if(err.code == 'ER_DUP_ENTRY'){
+                const sqlMessageParse = /^Duplicate entry '(.*)' for key '(.*)'$/.exec(err.sqlMessage)
+
+                if(sqlMessageParse[2] == 'product_AK'){
+                    return res.json({ message: 'This store already has another product with this name!' });
+                }
+
+                return res.json({ message: 'The ' + sqlMessageParse[2] + ' enterred is in use by another product!' });
+            }
             console.log(err);
-            return res.json({message: 'Server Error'});
+            res.status(500).json({ message: "Server Error" });
         }
     }
 

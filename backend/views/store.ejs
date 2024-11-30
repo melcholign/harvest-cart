@@ -8,23 +8,29 @@
 <% } %>
 
 <h3>Current rating: <%= store.rating %></h3>
-<h3>Cover Image: <%= store.cover_img_path %></h3>
-<h3>Gallery Images: <%= store.gallery_imgs_path %></h3>
+<h3>Cover Image:</h3>
+<img src="/<%= store.cover_img_path %>" alt="cover_img" width="200" height="125">
+<h3>Gallery Images:</h3>
+<% for(let i = 0; i < 8; i++){ %>
+  <img src="/<%= store.gallery_imgs_path %>/<%= i %>.jpg" width="200" height="125">
+<% } %>
 
-<form action="/farmer/store/product/<%= store.storeId%>/add" method="GET">
+<form action="/farmer/store/<%= store.storeId %>/update" method="GET">
+  <button type="submit">Edit Store</button>
+</form>
+
+<form action="/farmer/store/<%= store.storeId %>/product/add" method="GET">
   <button type="submit">Add Product</button>
 </form>
 
 
 <% for(let i = 0; i < products.length; i++){ %>
     <h3><%= i %>. product name:<%= products[i].productName %>  Rating:<%= products[i].rating %>    In stock:<%= products[i].stockQuantity %>  Price:<%= products[i].price %></h3>
-    <form action="/farmer/store/product" method="POST">
-      <input type="text" name="productId" value=<%= products[i].productId %> hidden>
-      <input type="text" name="storeId" value=<%= store.storeId %> hidden>
+    <form action="/farmer/store/<%= store.storeId%>/product/<%= products[i].productId%>" method="GET">
+      <img src="/<%= products[i].thumbnailImgPath %>" alt="product_thumbnail" width="200" height="125">
       <button type="submit">Check</button>
     </form>
     <hr>
   <% } %>
 
-
-<a href="/farmer">Return</a>
+<a href="/farmer">Return to Dashboard</a>

@@ -58,49 +58,24 @@ class FarmerController{
         console.log(req.body);
         const {firstname, lastname, gender, dob, mobile, address, nid, pfp, email, password} = req.body;
         
+        // must check for empty strings because they don't count as NULL in mysql (so NOT NULL constraint does not check for them)
         if(!(firstname && lastname && dob && mobile && address && nid && email && password)){
             return res.json({ message: "All required input fields must be filled!" });
         }
-
         try {
-            console.log(email);
-            const existingFarmer = await FarmerModel.getByEmail(email);
-    
-            if(existingFarmer) {
-                return res.status(400).json({ message: 'An account with this email already exists' });
-            }
-            
             const hashedPassword = await bcryptjs.hash(password, 10);
             await FarmerModel.register(firstname, lastname, gender, dob, mobile, address, nid, pfp, email, hashedPassword);
             
             res.redirect('/farmer/login');
         }catch(err) {
+            if(err.code == 'ER_DUP_ENTRY'){
+                const sqlMessageParse = /^Duplicate entry '(.*)' for key '(.*)'$/.exec(err.sqlMessage)
+                return res.json({ message: 'The ' + sqlMessageParse[2] + ' enterred is in use by another account!' });
+            }
             console.log(err);
             res.status(500).json({ message: "Server Error" });
         }
     };
-    
-    /*
-    static async login(req, res){
-        const {email, password} = req.body;
-        
-        try{
-            const [matchingFarmer, ] = await FarmerModel.getByEmail(email);
-            if(!matchingFarmer){
-                return res.status(404).json({ message: 'Incorrect email address' });
-            }
-
-            const passwordMatch = await bcryptjs.compare(password, matchingFarmer.pass_hash);
-            if(!passwordMatch){
-                return res.status(401).json({ message: 'Incorrect password or email.' });
-            }
-            
-
-
-        
-        }            
-    }
-    */
         
 
     static async update(req, res){
@@ -108,27 +83,18 @@ class FarmerController{
         console.log(req.body);
 
         const {firstname, lastname, gender, dob, mobile, address, nid, pfp, email, password} = req.body;
-        
-        const thisFarmerID = req.user.farmer_id;
-        console.log('This farmers id:' + thisFarmerID);
+        console.log('This farmers id:' + req.user.farmer_id);
 
         if(!(firstname && lastname && dob && mobile && address && nid && email)){
             return res.json({ message: "All required input fields must be filled!" });
         }
 
         try {
-            // should ideally return nothing (new email address) OR their own farmer account (same old email address)
-            const  checkFarmer = await FarmerModel.getByEmail(email);
-            console.log('checkFarmer: ' + checkFarmer);
-            if(checkFarmer && checkFarmer.farmer_id != thisFarmerID) {
-                return res.status(400).json({ message: 'This email is in use by another account!' });
-            }
-            
             let hashedPassword;
             if(!password){
                 // no password enterred so reinsert old password hash
                 console.log("Old pass reinserted");
-                const storeFarmer = await FarmerModel.getByID(thisFarmerID);
+                const storeFarmer = await FarmerModel.getByID(req.user.farmer_id);
                 hashedPassword = storeFarmer.pass_hash;
                 console.log(hashedPassword);
             } else {
@@ -137,10 +103,14 @@ class FarmerController{
                 hashedPassword = await bcryptjs.hash(password, 10);
             }
 
-            await FarmerModel.update(firstname, lastname, gender, dob, mobile, address, nid, pfp, email, hashedPassword, thisFarmerID);
-            
+            await FarmerModel.update(firstname, lastname, gender, dob, mobile, address, email, hashedPassword, req.user.farmer_id);
+            req.session.passport.user.email = email;
             res.redirect('/farmer');
         }catch(err) {
+            if(err.code == 'ER_DUP_ENTRY'){
+                const sqlMessageParse = /^Duplicate entry '(.*)' for key '(.*)'$/.exec(err.sqlMessage)
+                return res.json({ message: 'The ' + sqlMessageParse[2] + ' enterred is in use by another account!' });
+            }
             console.log(err);
             res.status(500).json({ message: "Server Error" });
         }
@@ -148,6 +118,7 @@ class FarmerController{
 
     static async delete(req, res){
         try{
+            // must store the farmer's id as req.user.farmer_id is not available after logging out
             const storedID = req.user.farmer_id;
             req.logout((err) => {
                 if (err) { 

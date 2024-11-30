@@ -52,42 +52,40 @@ class StoreController{
     */
 
     static async add(req, res){
-        const { store_name, description, gallery_imgs, cover_img } = req.body;
-        const farmer_id = req.user.farmer_id;
+        console.log(req.body);
+        const { store_name, description } = req.body;
 
         if(!store_name){
             return res.json({ message: 'All required input fields must be filled!'});
         }
+        
+        const cover_img_path = 'src/farmer/' + req.user.farmer_id + '/store/' + req.body.store_name + '/cover.jpg';
+        const gallery_imgs_path = 'src/farmer/' + req.user.farmer_id + '/store/' + req.body.store_name + '/gallery/';
 
-        const storesOfFarmer = await FarmerModel.getStores(farmer_id);
-        console.log(storesOfFarmer);
-        for(let x of storesOfFarmer){
-            if(x.store_name == store_name){
-                return res.json({ message: "Farmer already has a store with such name." });
-            }
-        }
 
         try{
-            await StoreModel.add(farmer_id, store_name, description, gallery_imgs, cover_img);
+            await StoreModel.add(req.user.farmer_id, store_name, description, gallery_imgs_path, cover_img_path);
             return res.redirect('/farmer');
-        }catch(err){
+        }catch(err) {
+            if(err.code == 'ER_DUP_ENTRY'){
+                const sqlMessageParse = /^Duplicate entry '(.*)' for key '(.*)'$/.exec(err.sqlMessage)
+
+                if(sqlMessageParse[2] == 'store_AK'){
+                    return res.json({ message: 'This farmer account already has another store with this name!' });
+                }
+
+                return res.json({ message: 'The ' + sqlMessageParse[2] + ' enterred is in use by another store!' });
+            }
             console.log(err);
-            return res.json({message: 'Server Error'});
+            res.status(500).json({ message: "Server Error" });
         }
     }
 
     static async enterStore(req, res){
         try{
-            const store = await StoreModel.getByID(req.body.storeId);
-            
-            // some access restriction in case post request body is altered by attackers
-            if(store.farmer_id != req.user.farmer_id){
-                return res.json({ message: 'Access denied!'});
-            }
-
             res.render('store.ejs', {
-                store: store,
-                products: await StoreModel.getProducts(req.body.storeId)
+                store: res.locals.store,
+                products: await StoreModel.getProducts(req.params.storeId)
             });
         }catch(err){
             console.log(err);
@@ -95,8 +93,50 @@ class StoreController{
         }
     }
 
-    
+    static async update(req, res){
+        console.log('Updating store:');
+        console.log(req.body);
+        console.log('This stores id:' + req.params.storeId);
 
+        const {store_name, description} = req.body;
+
+        if(!(store_name)){
+            return res.json({ message: "All required input fields must be filled!" });
+        }
+
+        try {
+            await StoreModel.update(req.params.storeId, store_name, description);
+            res.redirect('/farmer/store/' + req.params.storeId);
+        }catch(err) {
+            if(err.code == 'ER_DUP_ENTRY'){
+                const sqlMessageParse = /^Duplicate entry '(.*)' for key '(.*)'$/.exec(err.sqlMessage)
+
+                if(sqlMessageParse[2] == 'store_AK'){
+                    return res.json({ message: 'This farmer account already has another store with this name!' });
+                }
+
+                return res.json({ message: 'The ' + sqlMessageParse[2] + ' enterred is in use by another store!' });
+            }
+            console.log(err);
+            res.status(500).json({ message: "Server Error" });
+        }
+    };
+
+    static async delete(req, res){
+        try{
+            const storedID = req.user.farmer_id;
+            req.logout((err) => {
+                if (err) { 
+                    return next(err); 
+                }
+            });
+            await FarmerModel.delete(storedID);
+            res.redirect('/farmer/register');
+        }catch(err){
+            console.log(err);
+            res.status(500).json({ message: "Server Error" });
+        }
+    }
 }
 
 export { StoreController };

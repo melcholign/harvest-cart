@@ -8,7 +8,7 @@ CREATE TABLE IF NOT EXISTS farmer(
 
     firstname varchar(20) NOT NULL,
     lastname varchar(20) NOT NULL,
-    gender ENUM('male', 'female', 'other') NULL,
+    gender ENUM('male', 'female', 'other') NOT NULL,
     dob DATE NOT NULL,
     mobile varchar(20) NOT NULL UNIQUE,
     address varchar(50) NOT NULL,
@@ -146,7 +146,7 @@ class FarmerModel {
         }
     }
 
-    static async update(firstname, lastname, gender, dob, mobile, address, NID_img_path, pfp_img_path, email, pass_hash, farmer_id) {
+    static async update(firstname, lastname, gender, dob, mobile, address, email, pass_hash, farmer_id) {
         const query =
             `UPDATE farmer
          SET firstname = '${firstname}', 
@@ -155,8 +155,6 @@ class FarmerModel {
          dob = '${dob}', 
          mobile = '${mobile}',
          address = '${address}',
-         nid_img_path = '${NID_img_path}',
-         pfp_img_path = '${pfp_img_path}',
          email = '${email}',
          pass_hash = '${pass_hash}'
          WHERE farmer_id = ${farmer_id};`;

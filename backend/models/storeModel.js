@@ -17,7 +17,8 @@ CREATE TABLE IF NOT EXISTS store(
     dateUpdated TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
 
     PRIMARY KEY(storeId),
-    FOREIGN KEY(farmer_id) REFERENCES farmer(farmer_id)
+    FOREIGN KEY(farmer_id) REFERENCES farmer(farmer_id),
+    UNIQUE KEY store_AK (store_name,farmer_id)
 );
 `
 await pool.query(schema);
@@ -127,13 +128,11 @@ class StoreModel {
     }
 
 
-    static async update(storeId, store_name, description, gallery_imgs_path, cover_img_path) {
+    static async update(storeId, store_name, description) {
         const query =
             `UPDATE store
          SET store_name = '${store_name}',
-             description = '${description}',
-             gallery_imgs_path = '${gallery_imgs_path}',
-             cover_img_path = '${cover_img_path}'
+             description = '${description}'
          WHERE storeId = ${storeId};`;
 
         try {

@@ -17,8 +17,8 @@
 
 <% for(let i = 0; i < stores.length; i++){ %>
   <h3><%= i %>. Name:<%= stores[i].store_name %>  Rating:<%= stores[i].rating %> Open:<%= stores[i].is_open %></h3>
-  <form action="/farmer/store" method="POST">
-    <input type="text" name="storeId" value=<%= stores[i].storeId %> hidden>
+  <form action="/farmer/store/<%= stores[i].storeId %>" method="GET">
+    <img src="<%= stores[i].cover_img_path %>" alt="cover image" width="200" height="125">
     <button type="submit">Check</button>
   </form>
   <hr>

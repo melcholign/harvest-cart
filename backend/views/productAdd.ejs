@@ -1,5 +1,9 @@
 <h1>Add Product</h1>
-<form action="/farmer/store/product/add" method="POST">
+<form action="/farmer/store/<%= store.storeId %>/product/add" method="POST" enctype="multipart/form-data">
+
+  
+  <input type="text" name="store_name" value="<%= store.store_name %>" hidden>
+
   <div>
     <label for="productName">product name</label>
     <input type="text" id="product_name" name="productName" required>
@@ -55,11 +59,13 @@
 
   <div>
     <label for="thumbnailImg">thumbnailImg</label>
-    <input type="text" id="thumbnailImg" name="thumbnailImg" required>
+    <input type="file" id="thumbnailImg" name="thumbnail" required>
   </div>
 
+  <!--
   <input type="text" name="storeId" value=<%= store.storeId %> hidden>
+  -->
 
   <button type="submit">Add</button>
 </form>
-<a href="/farmer/store">Cancel</a>
+<a href="/farmer/store/<%= store.storeId %>">Cancel</a>

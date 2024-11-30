@@ -24,7 +24,8 @@ farmerRouter.post('/login', checkNotAuthenticated, passport.authenticate('local-
 farmerRouter.get('', checkAuthenticated, async (req, res) => {
   console.log(await FarmerModel.getStores(req.user.farmer_id));
   res.render('index.ejs', { name: req.user.firstname + " " + req.user.lastname,
-    stores: await FarmerModel.getStores(req.user.farmer_id)
+    stores: await FarmerModel.getStores(req.user.farmer_id),
+    farmer_id: req.user.farmer_id
   })
 })
 farmerRouter.get('/update', checkAuthenticated, (req, res) => {

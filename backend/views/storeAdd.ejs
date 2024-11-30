@@ -1,5 +1,5 @@
 <h1>Add store</h1>
-<form action="/farmer/store/add" method="POST">
+<form action="/farmer/store/add" method="POST" enctype="multipart/form-data">
   <div>
     <label for="store_name">store name</label>
     <input type="text" id="store_name" name="store_name" required>
@@ -11,11 +11,11 @@
   
   <div>
     <label for="gallery_imgs">gallery_imgs</label>
-    <input type="text" id="gallery_imgs" name="gallery_imgs" required>
+    <input type="file" id="gallery_imgs" name="gallery" multiple/>
   </div>
   <div>
     <label for="cover_img">cover_img</label>
-    <input type="text" id="cover_img" name="cover_img" required>
+    <input type="file" id="cover_img" name="cover" />
   </div>
   <button type="submit">Add</button>
 </form>

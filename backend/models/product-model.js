@@ -24,8 +24,9 @@ CREATE TABLE IF NOT EXISTS Product (
     dateCreated TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     dateUpdated TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
 
-    PRIMARY KEY(productId)
-    -- FOREIGN KEY(storeId) REFERENCES store(storeId),
+    PRIMARY KEY(productId),
+    FOREIGN KEY(storeId) REFERENCES store(storeId),
+    UNIQUE KEY product_AK (productName, storeId)
 );
 `
 await loadSchema(pool, schema, 'Product');
