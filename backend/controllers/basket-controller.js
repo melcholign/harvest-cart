@@ -30,6 +30,8 @@ class BasketController {
             BasketModel.setQuantity(pool, customerId, product.id, product.stockQuantity);
         }
 
+        console.log(basket, invalidProducts);
+
         return res.json({
             basket,
             changes: invalidProducts,
@@ -50,6 +52,7 @@ class BasketController {
         const { customerId } = req.user;
         const { productId } = req.body;
 
+        console.log(productId);
         try {
             await BasketModel.addProduct(pool, customerId, productId);
         } catch (err) {
@@ -187,9 +190,11 @@ class BasketController {
         if (invalidProducts.length != 0) {
             return res.status(409).json({
                 invalidProducts,
-                error: 'invalid products',
+                error: 'basket quantity exceeds stock quantity',
             });
         }
+
+        next();
     }
 
     /**
@@ -262,7 +267,6 @@ class BasketController {
                     ...basketMap[id],
                     basketQuantity: basketMap[id].quantity,
                     stockQuantity: inventoryMap[id].stockQuantity,
-                    reason: 'Basket quantity exceeds stock quantity',
                 }
 
                 delete product.quantity;

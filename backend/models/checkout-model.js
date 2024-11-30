@@ -12,6 +12,7 @@ CREATE TABLE IF NOT EXISTS Checkout (
     customerId INT NOT NULL,
     paymentId INT NULL,
     shippingAddress VARCHAR(255) NULL,
+    amount NUMERIC(15,2) NOT NULL,
     createdAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
 
     PRIMARY KEY(customerId),
@@ -33,8 +34,8 @@ CREATE TABLE IF NOT EXISTS CheckoutItem (
 )
 `;
 
-// loadSchema(pool, checkoutSchema, 'Checkout');
-// await loadSchema(pool, checkoutItemSchema, 'Checkout Item');
+loadSchema(pool, checkoutSchema, 'Checkout');
+await loadSchema(pool, checkoutItemSchema, 'Checkout Item');
 
 /**
  * @hideconstructor
@@ -67,6 +68,7 @@ class CheckoutModel {
      * of an item.
      * @param {Number} basketItems[].productQuantity - Specifies the quantity 
      * of the product.
+     * @param {Number} basketItems[].aggregatePrice - used to calculate the amount for checkout
      * @throws {Error} - When the checkout process is already running for a
      * customer. 
      */
@@ -77,10 +79,14 @@ class CheckoutModel {
             });
         }
 
-        const createSessionQuery = 'INSERT INTO Checkout(CustomerId) VALUES(?)';
+        const amount = basketItems.reduce((sum, item) => {
+            return sum + item.aggregatePrice;
+        }, 0)
+
+        const createSessionQuery = 'INSERT INTO Checkout(customerId, amount) VALUES(?, ?)';
 
         try {
-            await connection.query(createSessionQuery, [customerId]);
+            await connection.query(createSessionQuery, [customerId, amount]);
         } catch (err) {
             throw new Error('Checkout session already exists', {
                 cause: 'Duplicate customer ID',
@@ -115,7 +121,7 @@ class CheckoutModel {
     static async getSession(connection, customerId) {
         const getQuery = 'SELECT * FROM Checkout WHERE customerId = ?';
         const [results] = await connection.query(getQuery, [customerId]);
-        
+
         return results[0];
     }
 

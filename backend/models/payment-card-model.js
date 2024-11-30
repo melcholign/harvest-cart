@@ -50,11 +50,13 @@ class PaymentCardModel {
         return results[0];
     }
 
-    static async getCardByDetails(connection, cardNumber, cardType, brand) {
+    static async getCardByDetails(connection, cardNumber, cardType, cvv, expiryDate, brand) {
         const getQuery = 'SELECT * FROM PaymentCard WHERE '
-            + 'cardNumber = ? AND cardType = ? AND brand = ?';
+            + 'cardNumber = ? AND cardType = ? AND cvv = ? AND expiryDate = ? AND brand = ?';
 
-        const [results] = await connection.query(getQuery, [cardNumber, cardType, brand]);
+        const [results] = await connection.query(getQuery, [
+            cardNumber, cardType, cvv, expiryDate, brand
+        ]);
 
         if (results.length === 0) {
             throw new Error('Card does not exist');

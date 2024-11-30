@@ -63,9 +63,34 @@ class PaymentModel {
         }
     }
 
-    static async refund(connection, paymentId, paymentProcessor) {
+    static async changePaymentMethod(connection, paymentId, paymentMethod) {
+        try {
+            const paymentInfo = await PaymentModel.getPaymentInformation(connection, paymentId);
+            if (paymentInfo.paymentStatus !== 'pending') {
+                throw new Error('Cannot change method of non-pending payments');
+            }
+        } catch (err) {
+            throw err;
+        }
+
+        const changeQuery = 'UPDATE Payment SET paymentMethod = ? '
+            + 'WHERE paymentId = ? AND paymentStatus = ?';
+        await connection.query(changeQuery, [paymentMethod, paymentId, 'pending']);
+    }
+
+    static async refund(connection, paymentId) {
         const refundQuery = 'UPDATE Payment SET paymentStatus = ? WHERE paymentId = ? AND paymentMethod = ?';
         await connection.query(refundQuery, ['refund', paymentId, 'digital']);
+    }
+
+    static async deletePayment(connection, paymentId) {
+        const deleteQuery = 'DELETE FROM Payment WHERE paymentId = ?';
+
+        const [result] = connection.query(deleteQuery, [paymentId]);
+
+        if (result.affectedRows === 0) {
+            throw new Error('No such payment exists.');
+        }
     }
 }
 

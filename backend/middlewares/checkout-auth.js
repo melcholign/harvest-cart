@@ -2,7 +2,7 @@ import { CheckoutModel } from '../models/checkout-model.js';
 import { pool } from '../db/pool.js';
 
 export function blockDuringCheckout(req, res, next) {
-    if (req.user.isCheckingOut) {
+    if (req.user.checkoutSession) {
         return res.sendStatus(403);
     }
 
@@ -13,7 +13,7 @@ export async function getCheckoutSession(req, res, next) {
     const checkoutSession = await CheckoutModel.getSession(pool, req.user.customerId);
 
     if (checkoutSession) {
-        req.user.isCheckingOut = true;
+        req.user.checkoutSession = checkoutSession;
     }
 
     next();

@@ -8,7 +8,7 @@ CREATE TABLE IF NOT EXISTS OnlineTransaction (
     isRefunded BOOLEAN NOT NULL DEFAULT false,
 
     PRIMARY KEY(cardId, paymentId),
-    FOREIGN KEY(paymentId) REFERENCES Payment(paymentId),
+    FOREIGN KEY(paymentId) REFERENCES Payment(paymentId) ON DELETE CASCADE,
     FOREIGN KEY(cardId) REFERENCES PaymentCard(cardId)
 )
 `;
@@ -25,6 +25,12 @@ class OnlineTransactionModel {
         } catch (err) {
             throw new Error('online transaction has already been recorded');
         }
+    }
+
+    static async deleteOnlineTransaction(connection, paymentId) {
+        const deleteQuery = 'DELETE FROM OnlineTransaction WHERE paymentId = ?';
+
+        await connection.query(deleteQuery, [paymentId]);
     }
 }
 

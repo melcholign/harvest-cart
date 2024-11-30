@@ -3,6 +3,7 @@ app.test.js
 
 # Test router
 router.test.js
+test-routes
 
 # Logs
 logs

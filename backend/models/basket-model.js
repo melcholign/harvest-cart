@@ -68,14 +68,16 @@ class BasketModel {
 
         try {
             const [result] = await connection.query(query, [customerId, productId, productId]);
+
+            if (result.affectedRows === 0) {
+                throw new Error('unable to add product', { cause: 'out of stock' });
+            }
         } catch (err) {
             if (err.code === 'ER_DUP_ENTRY') {
                 throw new Error('product already added', { cause: 'duplicate' })
             }
-        }
 
-        if (result.affectedRows === 0) {
-            throw new Error('unable to add product', { cause: 'out of stock' });
+            throw err;
         }
     }
 
@@ -133,7 +135,6 @@ class BasketModel {
      * @throws an error if newQuantity < 0, and newQuantity > stockQuantity
      */
     static async setQuantity(connection, customerId, productId, newQuantity) {
-        console.log({ customerId, productId, newQuantity });
         if (newQuantity < 0) {
             throw new Error('invalid quantity', { cause: 'negative value' });
         }
