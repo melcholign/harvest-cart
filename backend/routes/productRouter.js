@@ -73,7 +73,7 @@ async function checkOwnership(req, res, next){
           return res.json({ message: 'No product with such ID. '});
         }
         if(product.storeId != res.locals.store.storeId){
-          return res.json({ message: 'Access denied!'});
+          return res.json({ message: 'This product does not belong to this store!'});
         }
         res.locals.product = product;
       }

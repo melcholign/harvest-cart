@@ -1,25 +1,30 @@
 <h1>Hi <%= name %></h1>
-<form action="/farmer/logout" method="POST">
-  <button type="submit">Log Out</button>
-</form>
 
-<form action="/farmer/delete" method="POST">
-  <button type="submit">Delete</button>
-</form>
+<div>
+  <form action="/farmer/logout" method="POST">
+    <button type="submit">Log Out</button>
+  </form>
 
-<form action="/farmer/update" method="GET">
-  <button type="submit">Edit</button>
-</form>
+  <form action="/farmer/delete" method="POST">
+    <button type="submit">Delete</button>
+  </form>
 
-<form action="/farmer/store/add" method="GET">
-  <button type="submit">Add Store</button>
-</form>
+  <form action="/farmer/update" method="GET">
+    <button type="submit">Edit</button>
+  </form>
+
+  <form action="/farmer/store/add" method="GET">
+    <button type="submit">Add Store</button>
+  </form>
+</div>
 
 <% for(let i = 0; i < stores.length; i++){ %>
-  <h3><%= i %>. Name:<%= stores[i].store_name %>  Rating:<%= stores[i].rating %> Open:<%= stores[i].is_open %></h3>
-  <form action="/farmer/store/<%= stores[i].storeId %>" method="GET">
-    <img src="<%= stores[i].cover_img_path %>" alt="cover image" width="200" height="125">
-    <button type="submit">Check</button>
-  </form>
-  <hr>
+  <div>
+    <h3><%= i %>. Name:<%= stores[i].store_name %>  Rating:<%= stores[i].rating %> Open:<%= stores[i].is_open %></h3>
+    <form action="/farmer/store/<%= stores[i].storeId %>" method="GET">
+      <img src="<%= stores[i].cover_img_path %>" alt="cover image" width="200" height="125">
+      <button type="submit">Check</button>
+    </form>
+    <hr>
+  </div>
 <% } %>

@@ -25,12 +25,14 @@
 
 
 <% for(let i = 0; i < products.length; i++){ %>
+  <div>
     <h3><%= i %>. product name:<%= products[i].productName %>  Rating:<%= products[i].rating %>    In stock:<%= products[i].stockQuantity %>  Price:<%= products[i].price %></h3>
     <form action="/farmer/store/<%= store.storeId%>/product/<%= products[i].productId %>/update" method="GET">
       <img src="/<%= products[i].thumbnailImgPath %>" alt="product_thumbnail" width="200" height="125">
       <button type="submit">Edit</button>
     </form>
     <hr>
+  </div>
   <% } %>
 
 <a href="/farmer">Return to Dashboard</a>
