@@ -1,0 +1,45 @@
+<h1><%= store.storeName %></h1>
+<h2><%= store.description %></h2>
+
+<% if(store.isOpen){ %>
+    <h3>Status: Open</h3>
+<% } else { %>
+    <h3>Status: Closed</h3>
+<% } %>
+
+<h3>Current rating: <%= store.rating %></h3>
+<h3>Cover Image:</h3>
+<img src="/<%= store.coverImgPath %>" alt="cover_img" width="200" height="125">
+<h3>Gallery Images:</h3>
+<% for(let i = 0; i < 8; i++){ %>
+  <img src="/<%= store.galleryImgsPath %>/<%= i %>.jpg" width="200" height="125">
+<% } %>
+
+<form action="/farmer/store/<%= store.storeId %>/update" method="GET">
+  <button type="submit">Edit Store</button>
+</form>
+
+<form action="/farmer/store/<%= store.storeId %>/delete" method="POST">
+  <button type="submit">Delete Store</button>
+</form>
+
+<form action="/farmer/store/<%= store.storeId %>/product/add" method="GET">
+  <button type="submit">Add Product</button>
+</form>
+
+
+<% for(let i = 0; i < products.length; i++){ %>
+  <div>
+    <h3><%= i %>. product name:<%= products[i].productName %>  Rating:<%= products[i].rating %>    In stock:<%= products[i].stockQuantity %>  Price:<%= products[i].price %></h3>
+    <img src="/<%= products[i].thumbnailImgPath %>" alt="product_thumbnail" width="200" height="125">
+    <form action="/farmer/store/<%= store.storeId%>/product/<%= products[i].productId %>/update" method="GET">
+      <button type="submit">Edit</button>
+    </form>
+    <form action="/farmer/store/<%= store.storeId%>/product/<%= products[i].productId %>/delete" method="POST">
+      <button type="submit">Delete</button>
+    </form>
+    <hr>
+  </div>
+  <% } %>
+
+<a href="/farmer">Return to Dashboard</a>

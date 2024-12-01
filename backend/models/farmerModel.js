@@ -1,32 +1,64 @@
 import { pool } from '../db/pool.js';
-import { loadSchema } from '../utils/schema-loader.js';
 
-const schema =
+/**
+ * SQL schema for the 'farmer' table.
+ */
+const schemaFarmer =
     `
 CREATE TABLE IF NOT EXISTS farmer(
-    farmer_id int NOT NULL AUTO_INCREMENT,
+    farmerId int NOT NULL AUTO_INCREMENT,
 
     firstname varchar(20) NOT NULL,
     lastname varchar(20) NOT NULL,
-    gender ENUM('male', 'female', 'other') NULL,
+    gender ENUM('male', 'female', 'other') NOT NULL,
     dob DATE NOT NULL,
     mobile varchar(20) NOT NULL UNIQUE,
     address varchar(50) NOT NULL,
-    nid_img_path varchar(255) NOT NULL UNIQUE,
-    pfp_img_path varchar(255) NULL UNIQUE,
+    nidImgPath varchar(255) NOT NULL UNIQUE,
+    pfpImgPath varchar(255) NULL UNIQUE,
 
     email varchar(50) NOT NULL UNIQUE,
-    pass_hash varchar(255) NOT NULL,
+    passHash varchar(255) NOT NULL,
 
-    date_created TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    date_updated TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    dateCreated TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    dateUpdated TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
 
-    PRIMARY KEY(farmer_id)
+    PRIMARY KEY(farmerId)
 );
 `
-loadSchema(pool, schema, 'Farmer');
+/**
+ * SQL schema for the 'store' table.
+ */
+const schemaStore =
+`
+CREATE TABLE IF NOT EXISTS store(
+    storeId int NOT NULL AUTO_INCREMENT,
+    farmerId int NOT NULL,
+
+    storeName varchar(50) NOT NULL,
+    rating float,
+    isOpen BOOLEAN NOT NULL,
+    description varchar(5000),
+    galleryImgsPath varchar(255),
+    coverImgPath varchar(255),
+
+    dateCreated TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    dateUpdated TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+
+    PRIMARY KEY(storeId),
+    FOREIGN KEY(farmerId) REFERENCES farmer(farmerId)
+);
+`
+await pool.query(schemaFarmer);
+await pool.query(schemaStore);
 
 class FarmerModel {
+
+    /**
+     * Get all farmers from the database.
+     * @returns {Promise<Array>} List of farmers.
+     * @throws {Error} If query fails.
+     */
     static async getAll() {
         const query =
             `SELECT * FROM farmer;`;
@@ -40,6 +72,12 @@ class FarmerModel {
         }
     }
 
+    /**
+     * Get a farmer by email.
+     * @param {string} email - The email of the farmer.
+     * @returns {Promise<Object>} The farmer object.
+     * @throws {Error} If query fails.
+     */
     static async getByEmail(email) {
         const query =
             `SELECT * 
@@ -55,11 +93,17 @@ class FarmerModel {
         }
     }
 
+    /**
+     * Get a farmer by ID.
+     * @param {number} id - The ID of the farmer.
+     * @returns {Promise<Object>} The farmer object.
+     * @throws {Error} If query fails.
+     */
     static async getByID(id) {
         const query =
             `SELECT * 
          FROM farmer f
-         WHERE f.farmer_id = "${id}";`;
+         WHERE f.farmerId = "${id}";`;
 
         try {
             const [results, fields] = await pool.query(query);
@@ -71,6 +115,12 @@ class FarmerModel {
     }
 
 
+    /**
+     * Search farmers by name.
+     * @param {string} searchString - The name search string.
+     * @returns {Promise<Array>} List of matching farmers.
+     * @throws {Error} If query fails.
+     */
     static async searchByName(search_string) {
         const query =
             `SELECT *
@@ -93,12 +143,17 @@ class FarmerModel {
         }
     }
 
-
-    static async register(firstname, lastname, gender, dob, mobile, address, NID_img_path, pfp_img_path, email, pass_hash) {
-
+    /**
+     * Get all stores of a farmer.
+     * @param {number} farmerId - The ID of the farmer.
+     * @returns {Promise<Array>} List of stores.
+     * @throws {Error} If query fails.
+     */
+    static async getStores(farmerId) {
         const query =
-            `INSERT into farmer (firstname, lastname, gender, dob, mobile, address, nid_img_path, pfp_img_path, email, pass_hash)
-         VALUES ('${firstname}', '${lastname}', '${gender}', '${dob}', '${mobile}', '${address}', '${NID_img_path}', '${pfp_img_path}', '${email}', '${pass_hash}');`;
+        `SELECT *
+        FROM store s
+        WHERE s.farmerId = ${farmerId};`;
 
         try {
             const [results, fields] = await pool.query(query);
@@ -109,7 +164,53 @@ class FarmerModel {
         }
     }
 
-    static async update(firstname, lastname, gender, dob, mobile, address, NID_img_path, pfp_img_path, email, pass_hash, farmer_id) {
+
+
+    /**
+     * Register a new farmer.
+     * @param {string} firstname - Farmer's first name.
+     * @param {string} lastname - Farmer's last name.
+     * @param {string} gender - Farmer's gender.
+     * @param {Date} dob - Farmer's date of birth.
+     * @param {string} mobile - Farmer's mobile number.
+     * @param {string} address - Farmer's address.
+     * @param {string} nidImgPath - Path to farmer's NID image.
+     * @param {string} pfpImgPath - Path to farmer's profile picture.
+     * @param {string} email - Farmer's email address.
+     * @param {string} passHash - Hash of farmer's password.
+     * @returns {Promise<Object>} Result of the registration.
+     * @throws {Error} If query fails.
+     */
+    static async register(firstname, lastname, gender, dob, mobile, address, nidImgPath, pfpImgPath, email, passHash) {
+
+        const query =
+            `INSERT into farmer (firstname, lastname, gender, dob, mobile, address, nidImgPath, pfpImgPath, email, passHash)
+         VALUES ('${firstname}', '${lastname}', '${gender}', '${dob}', '${mobile}', '${address}', '${nidImgPath}', '${pfpImgPath}', '${email}', '${passHash}');`;
+
+        try {
+            const [results, fields] = await pool.query(query);
+            return results;
+        } catch (err) {
+            console.log("Error executing query:" + err);
+            throw err;
+        }
+    }
+
+    /**
+     * Update a farmer's information.
+     * @param {string} firstname - Farmer's first name.
+     * @param {string} lastname - Farmer's last name.
+     * @param {string} gender - Farmer's gender.
+     * @param {Date} dob - Farmer's date of birth.
+     * @param {string} mobile - Farmer's mobile number.
+     * @param {string} address - Farmer's address.
+     * @param {string} email - Farmer's email address.
+     * @param {string} passHash - Hash of farmer's password.
+     * @param {number} farmerId - ID of the farmer to update.
+     * @returns {Promise<Object>} Result of the update.
+     * @throws {Error} If query fails.
+     */
+    static async update(firstname, lastname, gender, dob, mobile, address, email, passHash, farmerId) {
         const query =
             `UPDATE farmer
          SET firstname = '${firstname}', 
@@ -118,11 +219,9 @@ class FarmerModel {
          dob = '${dob}', 
          mobile = '${mobile}',
          address = '${address}',
-         nid_img_path = '${NID_img_path}',
-         pfp_img_path = '${pfp_img_path}',
          email = '${email}',
-         pass_hash = '${pass_hash}'
-         WHERE farmer_id = ${farmer_id};`;
+         passHash = '${passHash}'
+         WHERE farmerId = ${farmerId};`;
 
         try {
             const [results, fields] = await pool.query(query);
@@ -134,10 +233,16 @@ class FarmerModel {
     }
 
 
+    /**
+     * Delete a farmer by ID.
+     * @param {number} farmerId - ID of the farmer to delete.
+     * @returns {Promise<Object>} Result of the deletion.
+     * @throws {Error} If query fails.
+     */
     static async delete(farmer_ID) {
         const query =
             `DELETE FROM farmer
-        WHERE farmer_id = '${farmer_ID}';`;
+        WHERE farmerId = '${farmer_ID}';`;
 
         try {
             const [results, fields] = await pool.query(query);
@@ -149,15 +254,5 @@ class FarmerModel {
 
     }
 }
-
-// testing (PASSED)
-if (0) { console.log(await FarmerModel.register("Person", "I", "M", "2001-10-22", "01430850152", "Sylhet", "src/imgs/farmer/NID/wejofoej.jpg", "src/imgs/farmer/pfp/fowjfoj.jpg", "personI@gmail.com", "141fwei81AEF4014080")); }
-if (0) { console.log(await FarmerModel.register("Person", "II", "F", "1991-06-05", "01518530911", "Barishal", "src/imgs/farmer/NID/vwojvwow.jpg", "src/imgs/farmer/pfp/fowf32j.jpg", "personII@gmail.com", "fwojfweAEF4014080")); }
-if (0) { console.log(await FarmerModel.getAll()); }
-if (0) { console.log(await FarmerModel.getByID(1)); }
-if (0) { console.log(await FarmerModel.getByEmail('abrar123@gmail.com')); }
-if (0) { console.log(await FarmerModel.delete("10")); }
-if (0) { console.log(await FarmerModel.update("Edited", "Person", "E", "24-02-2010", "10853581", "Chittagong", "src/imgs/farmer/NID/wejofoej.jpg", "src/imgs/farmer/pfp/fowjfoj.jpg", "farmer@gmail.com", "14103481AEF4014080", "7")); }
-
 
 export { FarmerModel };
