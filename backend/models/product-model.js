@@ -1,6 +1,10 @@
 import { pool } from '../db/pool.js';
 import { loadSchema } from '../utils/schema-loader.js';
 
+
+/**
+ * SQL schema for the 'Product' table.
+ */
 const schema =
     `
 CREATE TABLE IF NOT EXISTS Product (
@@ -77,6 +81,12 @@ class ProductModel {
     }
 
 
+    /**
+     * Search products by name.
+     * @param {string} searchString - The name search string.
+     * @returns {Promise<Array<Object>>} List of matching products.
+     * @throws {Error} If query fails.
+     */
     static async searchByName(search_string){
         const query =
         `SELECT *
@@ -99,6 +109,12 @@ class ProductModel {
         }
     }
 
+    /**
+     * Search products by categories.
+     * @param {Array<string>} categories - The list of categories.
+     * @returns {Promise<Array<Object>>} List of matching products.
+     * @throws {Error} If query fails.
+     */
     static async searchByCategories(categories){
 
         let conditionString = `p.category = '` + categories[0] + `' `;
@@ -122,6 +138,12 @@ class ProductModel {
     }
 
 
+    /**
+     * Get a product by ID.
+     * @param {number} productId - The ID of the product.
+     * @returns {Promise<Object>} The product object.
+     * @throws {Error} If query fails.
+     */
     static async getByID(productId) {
         const query =
             `SELECT *
@@ -137,6 +159,17 @@ class ProductModel {
         }
     }
 
+    /**
+     * Add a new product.
+     * @param {number} storeId - The ID of the store.
+     * @param {string} category - The category of the product.
+     * @param {string} productName - The name of the product.
+     * @param {string} description - The description of the product.
+     * @param {number} price - The price of the product.
+     * @param {string} thumbnailImgPath - Path to the thumbnail image.
+     * @returns {Promise<Object>} Result of the addition.
+     * @throws {Error} If query fails.
+     */
     static async add(storeId, category ,productName, description, price, thumbnailImgPath){
         const query =
         `INSERT INTO product (storeId, category ,productName, description, price, thumbnailImgPath)
@@ -152,6 +185,16 @@ class ProductModel {
     }
 
 
+    /**
+     * Update a product's information.
+     * @param {number} productId - The ID of the product.
+     * @param {string} category - The category of the product.
+     * @param {string} productName - The name of the product.
+     * @param {string} description - The description of the product.
+     * @param {number} price - The price of the product.
+     * @returns {Promise<Object>} Result of the update.
+     * @throws {Error} If query fails.
+     */
     static async update(productId, category ,productName, description, price){
         // NOTE: no parameter for thumbnailImgPath as path remains same, just img on path is replaced by controller
         const query =
@@ -171,6 +214,12 @@ class ProductModel {
         }
     }
 
+    /**
+     * Delete a product by ID.
+     * @param {number} productId - The ID of the product.
+     * @returns {Promise<Object>} Result of the deletion.
+     * @throws {Error} If query fails.
+     */
     static async delete(productId){
         const query =
         `DELETE FROM product

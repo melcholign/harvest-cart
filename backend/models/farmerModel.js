@@ -1,7 +1,9 @@
 import { pool } from '../db/pool.js';
 
-/* //STUPID CODE RUNS IN PHPMYADMIN BUT throws <<<DUMB>>> "sYnTAx ErRoR" WHEN RUNNING THROUGH POOL.QUERY AAAAAAAAAAAAAAAAAAAHHHHHHHHHHHH
-const schema =
+/**
+ * SQL schema for the 'farmer' table.
+ */
+const schemaFarmer =
     `
 CREATE TABLE IF NOT EXISTS farmer(
     farmerId int NOT NULL AUTO_INCREMENT,
@@ -23,7 +25,12 @@ CREATE TABLE IF NOT EXISTS farmer(
 
     PRIMARY KEY(farmerId)
 );
-
+`
+/**
+ * SQL schema for the 'store' table.
+ */
+const schemaStore =
+`
 CREATE TABLE IF NOT EXISTS store(
     storeId int NOT NULL AUTO_INCREMENT,
     farmerId int NOT NULL,
@@ -42,12 +49,16 @@ CREATE TABLE IF NOT EXISTS store(
     FOREIGN KEY(farmerId) REFERENCES farmer(farmerId)
 );
 `
-await pool.query(schema);
-*/
-
-
+await pool.query(schemaFarmer);
+await pool.query(schemaStore);
 
 class FarmerModel {
+
+    /**
+     * Get all farmers from the database.
+     * @returns {Promise<Array>} List of farmers.
+     * @throws {Error} If query fails.
+     */
     static async getAll() {
         const query =
             `SELECT * FROM farmer;`;
@@ -61,6 +72,12 @@ class FarmerModel {
         }
     }
 
+    /**
+     * Get a farmer by email.
+     * @param {string} email - The email of the farmer.
+     * @returns {Promise<Object>} The farmer object.
+     * @throws {Error} If query fails.
+     */
     static async getByEmail(email) {
         const query =
             `SELECT * 
@@ -76,6 +93,12 @@ class FarmerModel {
         }
     }
 
+    /**
+     * Get a farmer by ID.
+     * @param {number} id - The ID of the farmer.
+     * @returns {Promise<Object>} The farmer object.
+     * @throws {Error} If query fails.
+     */
     static async getByID(id) {
         const query =
             `SELECT * 
@@ -92,6 +115,12 @@ class FarmerModel {
     }
 
 
+    /**
+     * Search farmers by name.
+     * @param {string} searchString - The name search string.
+     * @returns {Promise<Array>} List of matching farmers.
+     * @throws {Error} If query fails.
+     */
     static async searchByName(search_string) {
         const query =
             `SELECT *
@@ -114,6 +143,12 @@ class FarmerModel {
         }
     }
 
+    /**
+     * Get all stores of a farmer.
+     * @param {number} farmerId - The ID of the farmer.
+     * @returns {Promise<Array>} List of stores.
+     * @throws {Error} If query fails.
+     */
     static async getStores(farmerId) {
         const query =
         `SELECT *
@@ -131,11 +166,26 @@ class FarmerModel {
 
 
 
-    static async register(firstname, lastname, gender, dob, mobile, address, NID_img_path, pfpImgPath, email, passHash) {
+    /**
+     * Register a new farmer.
+     * @param {string} firstname - Farmer's first name.
+     * @param {string} lastname - Farmer's last name.
+     * @param {string} gender - Farmer's gender.
+     * @param {Date} dob - Farmer's date of birth.
+     * @param {string} mobile - Farmer's mobile number.
+     * @param {string} address - Farmer's address.
+     * @param {string} nidImgPath - Path to farmer's NID image.
+     * @param {string} pfpImgPath - Path to farmer's profile picture.
+     * @param {string} email - Farmer's email address.
+     * @param {string} passHash - Hash of farmer's password.
+     * @returns {Promise<Object>} Result of the registration.
+     * @throws {Error} If query fails.
+     */
+    static async register(firstname, lastname, gender, dob, mobile, address, nidImgPath, pfpImgPath, email, passHash) {
 
         const query =
             `INSERT into farmer (firstname, lastname, gender, dob, mobile, address, nidImgPath, pfpImgPath, email, passHash)
-         VALUES ('${firstname}', '${lastname}', '${gender}', '${dob}', '${mobile}', '${address}', '${NID_img_path}', '${pfpImgPath}', '${email}', '${passHash}');`;
+         VALUES ('${firstname}', '${lastname}', '${gender}', '${dob}', '${mobile}', '${address}', '${nidImgPath}', '${pfpImgPath}', '${email}', '${passHash}');`;
 
         try {
             const [results, fields] = await pool.query(query);
@@ -146,6 +196,20 @@ class FarmerModel {
         }
     }
 
+    /**
+     * Update a farmer's information.
+     * @param {string} firstname - Farmer's first name.
+     * @param {string} lastname - Farmer's last name.
+     * @param {string} gender - Farmer's gender.
+     * @param {Date} dob - Farmer's date of birth.
+     * @param {string} mobile - Farmer's mobile number.
+     * @param {string} address - Farmer's address.
+     * @param {string} email - Farmer's email address.
+     * @param {string} passHash - Hash of farmer's password.
+     * @param {number} farmerId - ID of the farmer to update.
+     * @returns {Promise<Object>} Result of the update.
+     * @throws {Error} If query fails.
+     */
     static async update(firstname, lastname, gender, dob, mobile, address, email, passHash, farmerId) {
         const query =
             `UPDATE farmer
@@ -169,6 +233,12 @@ class FarmerModel {
     }
 
 
+    /**
+     * Delete a farmer by ID.
+     * @param {number} farmerId - ID of the farmer to delete.
+     * @returns {Promise<Object>} Result of the deletion.
+     * @throws {Error} If query fails.
+     */
     static async delete(farmer_ID) {
         const query =
             `DELETE FROM farmer
@@ -184,15 +254,5 @@ class FarmerModel {
 
     }
 }
-
-// testing (PASSED)
-if (0) { console.log(await FarmerModel.register("Person", "I", "M", "2001-10-22", "01430850152", "Sylhet", "src/imgs/farmer/NID/wejofoej.jpg", "src/imgs/farmer/pfp/fowjfoj.jpg", "personI@gmail.com", "141fwei81AEF4014080")); }
-if (0) { console.log(await FarmerModel.register("Person", "II", "F", "1991-06-05", "01518530911", "Barishal", "src/imgs/farmer/NID/vwojvwow.jpg", "src/imgs/farmer/pfp/fowf32j.jpg", "personII@gmail.com", "fwojfweAEF4014080")); }
-if (0) { console.log(await FarmerModel.getAll()); }
-if (0) { console.log(await FarmerModel.getByID(1)); }
-if (0) { console.log(await FarmerModel.getByEmail('abrar123@gmail.com')); }
-if (0) { console.log(await FarmerModel.delete("10")); }
-if (0) { console.log(await FarmerModel.update("Edited", "Person", "E", "24-02-2010", "10853581", "Chittagong", "src/imgs/farmer/NID/wejofoej.jpg", "src/imgs/farmer/pfp/fowjfoj.jpg", "farmer@gmail.com", "14103481AEF4014080", "7")); }
-
 
 export { FarmerModel };

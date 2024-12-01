@@ -1,5 +1,9 @@
 import { pool } from '../db/pool.js';
 
+
+/**
+ * SQL schema for the 'store' table.
+ */
 const schema = 
 `
 CREATE TABLE IF NOT EXISTS store(
@@ -24,6 +28,12 @@ CREATE TABLE IF NOT EXISTS store(
 await pool.query(schema);
 
 class StoreModel {
+
+    /**
+     * Get all stores from the database.
+     * @returns {Promise<Array>} List of stores.
+     * @throws {Error} If query fails.
+     */
     static async getAll() {
         const query =
             `SELECT * FROM store;`;
@@ -37,6 +47,12 @@ class StoreModel {
         }
     }
 
+    /**
+     * Search stores by name.
+     * @param {string} searchString - The name search string.
+     * @returns {Promise<Array>} List of matching stores.
+     * @throws {Error} If query fails.
+     */
     static async searchByName(search_string) {
         const query =
             `SELECT *
@@ -59,8 +75,13 @@ class StoreModel {
         }
     }
 
+    /**
+     * Search stores by categories.
+     * @param {Array<string>} categories - The list of categories.
+     * @returns {Promise<Array>} List of matching stores.
+     * @throws {Error} If query fails.
+     */
     static async searchByCategories(categories) {
-
         let conditionString = `p.category = '` + categories[0] + `' `;
         for (let i = 1; i < categories.length; i++) {
             conditionString += `OR p.category = '` + categories[i] + `' `;
@@ -82,7 +103,12 @@ class StoreModel {
         }
     }
 
-    
+    /**
+     * Get all products of a store.
+     * @param {number} storeId - The ID of the store.
+     * @returns {Promise<Array>} List of products.
+     * @throws {Error} If query fails.
+     */
     static async getProducts(storeId){
         const query =
         `SELECT *
@@ -98,6 +124,12 @@ class StoreModel {
         }
     }
 
+    /**
+     * Get a store by ID.
+     * @param {number} storeId - The ID of the store.
+     * @returns {Promise<Object>} The store object.
+     * @throws {Error} If query fails.
+     */
     static async getByID(storeId) {
         const query =
             `SELECT *
@@ -113,6 +145,16 @@ class StoreModel {
         }
     }
 
+    /**
+     * Add a new store.
+     * @param {number} farmerId - The ID of the farmer.
+     * @param {string} storeName - The name of the store.
+     * @param {string} description - The description of the store.
+     * @param {string} galleryImgsPath - Path to the gallery images.
+     * @param {string} coverImgPath - Path to the cover image.
+     * @returns {Promise<Object>} Result of the addition.
+     * @throws {Error} If query fails.
+     */
     static async add(farmerId, storeName, description, galleryImgsPath, coverImgPath) {
         const query =
             `INSERT INTO store (farmerId, storeName, description, galleryImgsPath, coverImgPath)
@@ -127,7 +169,14 @@ class StoreModel {
         }
     }
 
-
+    /**
+     * Update a store's information.
+     * @param {number} storeId - The ID of the store.
+     * @param {string} storeName - The name of the store.
+     * @param {string} description - The description of the store.
+     * @returns {Promise<Object>} Result of the update.
+     * @throws {Error} If query fails.
+     */
     static async update(storeId, storeName, description) {
         const query =
             `UPDATE store
@@ -144,6 +193,12 @@ class StoreModel {
         }
     }
 
+    /**
+     * Delete a store by ID.
+     * @param {number} storeId - The ID of the store.
+     * @returns {Promise<Object>} Result of the deletion.
+     * @throws {Error} If query fails.
+     */
     static async delete(storeId) {
         const query =
             `DELETE FROM store
@@ -158,17 +213,5 @@ class StoreModel {
         }
     }
 }
-
-
-// testing (PASSED)
-if (0) { console.log(await StoreModel.getAll()); }
-if (0) { console.log(await StoreModel.getByID(2)); }
-if (0) { console.log(await StoreModel.create(6, 'Slaughterer of all Poultry', 'am chimken seller. all chimken country-raised. very much health :>', 'woejwe/jwgjw', 'owjiowfjjgrgo/efwioj')); }
-if (0) { console.log(await StoreModel.create(4, 'Abduls Groceries', 'Get the freshest groceries grown with care and love on our farmlands in countryside Sylhet.', 'oqjofjw/ifj.png', 'wtowffwe.jpeg')); }
-if (0) { console.log(await StoreModel.delete(1)); }
-if (0) { console.log(await StoreModel.update(1, 'edited Groceries', 'Get the edited groceries grown with care and love from our farmlands in edited edited.', 'edited/ifj.png', 'edited')); }
-
-
-// getByName, getByFarmer tests:
 
 export { StoreModel };
