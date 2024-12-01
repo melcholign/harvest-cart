@@ -80,7 +80,30 @@ class ProductController{
     }
 
 
+    static async update(req, res){
+        const { productName, category, description, price } = req.body;
 
+        if(!(productName && category && price)){
+            return res.json({ message: 'All required input fields must be filled!'});
+        }
+
+        try{
+            await ProductModel.update(req.params.productId, category, productName, description, price);
+            return res.redirect('/farmer/store/' + req.params.storeId);
+        }catch(err) {
+            if(err.code == 'ER_DUP_ENTRY'){
+                const sqlMessageParse = /^Duplicate entry '(.*)' for key '(.*)'$/.exec(err.sqlMessage)
+
+                if(sqlMessageParse[2] == 'product_AK'){
+                    return res.json({ message: 'This store already has another product with this name!' });
+                }
+
+                return res.json({ message: 'The ' + sqlMessageParse[2] + ' enterred is in use by another product!' });
+            }
+            console.log(err);
+            res.status(500).json({ message: "Server Error" });
+        }
+    }
     
 
 }

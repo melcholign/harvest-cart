@@ -122,6 +122,21 @@ class ProductModel {
     }
 
 
+    static async getByID(productId) {
+        const query =
+            `SELECT *
+        FROM product
+        WHERE productId = ${productId};`;
+
+        try {
+            const [results, fields] = await pool.query(query);
+            return results[0];
+        } catch (err) {
+            console.log("Error executing query:" + err);
+            throw err;
+        }
+    }
+
     static async add(storeId, category ,productName, description, price, thumbnailImgPath){
         const query =
         `INSERT INTO product (storeId, category ,productName, description, price, thumbnailImgPath)
@@ -137,12 +152,11 @@ class ProductModel {
     }
 
 
-    static async update(productId, storeId, category_id ,productName, description, price){
+    static async update(productId, category ,productName, description, price){
         // NOTE: no parameter for thumbnailImgPath as path remains same, just img on path is replaced by controller
         const query =
         `UPDATE product
-         SET storeId = '${storeId}',
-             category_id = '${category_id}',
+         SET category = '${category}',
              productName = '${productName}',
              description = '${description}',
              price = '${price}'

@@ -1,6 +1,7 @@
 import express from 'express';
 import { ProductController } from '../controllers/productController.js';
 import { StoreModel } from '../models/storeModel.js';
+import { ProductModel } from '../models/product-model.js';
 import { Store } from 'express-session';
 import fs from 'fs';
 
@@ -32,27 +33,19 @@ const storage = multer.diskStorage({
 const upload = multer( {storage: storage} );
 const imageUpload = upload.single('thumbnail');
 
-
-
 const productRouter = express.Router();
 
-// Protected routes
+// Protected Dynamic routes
 productRouter.get('/:storeId/product/add', checkAuthenticated, checkOwnership, async (req, res) => {
   res.render("productAdd.ejs", {store: res.locals.store});
 })
 productRouter.post('/:storeId/product/add', checkAuthenticated, checkOwnership, imageUpload, ProductController.add);
 
-productRouter.get('/:storeId/product/update', checkAuthenticated, (req, res) => {
-  res.render('updateStore.ejs', { store: req.user });
+productRouter.get('/:storeId/product/:productId/update', checkAuthenticated, checkOwnership, (req, res) => {
+  res.render('updateProduct.ejs', { product: res.locals.product });
 })
+productRouter.post('/:storeId/product/:productId/update', checkAuthenticated, checkOwnership, imageUpload, ProductController.update);
 
-// Protected Dynamic routes
-productRouter.get('/:storeId/product/:productId', checkAuthenticated, checkOwnership, async (req, res) =>{
-  res.render("product.ejs", {
-    store: res.locals.store,
-    products: await StoreModel.getProducts(req.params.storeId)});
-});
-//productRouter.post('/update', checkAuthenticated, ProductController.update);
 //productRouter.post('/delete', checkAuthenticated, ProductController.delete);
 
 
@@ -73,6 +66,17 @@ async function checkOwnership(req, res, next){
           return res.json({ message: 'Access denied!'});
       }
       res.locals.store = store;
+
+      if(req.params.productId){
+        const product = await ProductModel.getByID(req.params.productId);
+        if(!product){
+          return res.json({ message: 'No product with such ID. '});
+        }
+        if(product.storeId != res.locals.store.storeId){
+          return res.json({ message: 'Access denied!'});
+        }
+        res.locals.product = product;
+      }
       return next();
   }catch(err){
       console.log(err);
