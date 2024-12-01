@@ -51,7 +51,7 @@ productRouter.get('/:storeId/product/:productId/update', checkAuthenticated, che
 })
 productRouter.post('/:storeId/product/:productId/update', checkAuthenticated, checkOwnership, imageUpload, ProductController.update);
 
-//productRouter.post('/delete', checkAuthenticated, ProductController.delete);
+productRouter.post('/:storeId/product/:productId/delete', checkAuthenticated, checkOwnership, ProductController.delete);
 
 
 // middlewares

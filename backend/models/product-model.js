@@ -25,7 +25,7 @@ CREATE TABLE IF NOT EXISTS Product (
     dateUpdated TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
 
     PRIMARY KEY(productId),
-    FOREIGN KEY(storeId) REFERENCES store(storeId),
+    FOREIGN KEY(storeId) REFERENCES store(storeId) ON DELETE CASCADE,
     UNIQUE KEY product_AK (productName, storeId)
 );
 `

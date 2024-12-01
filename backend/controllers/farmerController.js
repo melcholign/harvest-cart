@@ -1,5 +1,6 @@
 import { FarmerModel } from '../models/farmerModel.js';
 import bcryptjs from 'bcryptjs';
+import fs from 'fs';
 
 
 class FarmerController{
@@ -122,6 +123,8 @@ class FarmerController{
 
     static async delete(req, res){
         try{
+            const farmerFolderPath = req.user.nid_img_path.replace('nid.jpg','');
+            fs.rmSync(farmerFolderPath, { recursive: true, force: true });
             // must store the farmer's id as req.user.farmer_id is not available after logging out
             const storedID = req.user.farmer_id;
             req.logout((err) => {

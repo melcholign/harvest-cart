@@ -1,6 +1,7 @@
 import { StoreModel } from "../models/storeModel.js";
 import { FarmerModel } from "../models/farmerModel.js";
 import { ProductModel } from "../models/product-model.js";
+import fs from 'fs';
 
 class StoreController{
     static async searchByName(req, res){
@@ -111,6 +112,7 @@ class StoreController{
             if(err.code == 'ER_DUP_ENTRY'){
                 const sqlMessageParse = /^Duplicate entry '(.*)' for key '(.*)'$/.exec(err.sqlMessage)
 
+                // index 2 because the second capturing grp in the regex contains the key that is being duplicated
                 if(sqlMessageParse[2] == 'store_AK'){
                     return res.json({ message: 'This farmer account already has another store with this name!' });
                 }
@@ -124,14 +126,10 @@ class StoreController{
 
     static async delete(req, res){
         try{
-            const storedID = req.user.farmer_id;
-            req.logout((err) => {
-                if (err) { 
-                    return next(err); 
-                }
-            });
-            await FarmerModel.delete(storedID);
-            res.redirect('/farmer/register');
+            const storeFolderPath = res.locals.store.cover_img_path.replace('cover.jpg','');
+            fs.rmSync(storeFolderPath, { recursive: true, force: true });
+            await StoreModel.delete(req.params.storeId);
+            res.redirect('/farmer');
         }catch(err){
             console.log(err);
             res.status(500).json({ message: "Server Error" });

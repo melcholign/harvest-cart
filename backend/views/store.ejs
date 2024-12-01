@@ -19,6 +19,10 @@
   <button type="submit">Edit Store</button>
 </form>
 
+<form action="/farmer/store/<%= store.storeId %>/delete" method="POST">
+  <button type="submit">Delete Store</button>
+</form>
+
 <form action="/farmer/store/<%= store.storeId %>/product/add" method="GET">
   <button type="submit">Add Product</button>
 </form>
@@ -27,9 +31,12 @@
 <% for(let i = 0; i < products.length; i++){ %>
   <div>
     <h3><%= i %>. product name:<%= products[i].productName %>  Rating:<%= products[i].rating %>    In stock:<%= products[i].stockQuantity %>  Price:<%= products[i].price %></h3>
+    <img src="/<%= products[i].thumbnailImgPath %>" alt="product_thumbnail" width="200" height="125">
     <form action="/farmer/store/<%= store.storeId%>/product/<%= products[i].productId %>/update" method="GET">
-      <img src="/<%= products[i].thumbnailImgPath %>" alt="product_thumbnail" width="200" height="125">
       <button type="submit">Edit</button>
+    </form>
+    <form action="/farmer/store/<%= store.storeId%>/product/<%= products[i].productId %>/delete" method="POST">
+      <button type="submit">Delete</button>
     </form>
     <hr>
   </div>

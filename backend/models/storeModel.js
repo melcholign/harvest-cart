@@ -17,7 +17,7 @@ CREATE TABLE IF NOT EXISTS store(
     dateUpdated TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
 
     PRIMARY KEY(storeId),
-    FOREIGN KEY(farmer_id) REFERENCES farmer(farmer_id),
+    FOREIGN KEY(farmer_id) REFERENCES farmer(farmer_id) ON DELETE CASCADE,
     UNIQUE KEY store_AK (store_name,farmer_id)
 );
 `

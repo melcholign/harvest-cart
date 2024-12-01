@@ -62,7 +62,9 @@ storeRouter.get('/:storeId/update', checkAuthenticated, checkOwnership, (req, re
   res.render('updateStore.ejs', { store: res.locals.store });
 })
 storeRouter.post('/:storeId/update', checkAuthenticated, checkOwnership, prepImgUpload, imageUpload, StoreController.update);
-//storeRouter.post('/:storeId/delete', checkAuthenticated, StoreController.delete);
+
+storeRouter.post('/:storeId/delete', checkAuthenticated, checkOwnership, StoreController.delete);
+
 storeRouter.get('/:storeId', checkAuthenticated, checkOwnership, StoreController.enterStore);
 
 

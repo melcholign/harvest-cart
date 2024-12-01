@@ -2,6 +2,7 @@ import { ProductModel } from "../models/product-model.js";
 import { FarmerModel } from "../models/farmerModel.js";
 import { StoreModel } from "../models/storeModel.js";
 import { StoreController } from "./storeController.js";
+import fs from 'fs';
 
 class ProductController{
     static async searchByName(req, res){
@@ -100,6 +101,18 @@ class ProductController{
 
                 return res.json({ message: 'The ' + sqlMessageParse[2] + ' enterred is in use by another product!' });
             }
+            console.log(err);
+            res.status(500).json({ message: "Server Error" });
+        }
+    }
+
+    static async delete(req, res){
+        try{
+            const productImagePath = res.locals.product.thumbnailImgPath;
+            fs.rmSync(productImagePath);
+            await ProductModel.delete(req.params.productId);
+            res.redirect('/farmer/store/' + req.params.storeId);
+        }catch(err){
             console.log(err);
             res.status(500).json({ message: "Server Error" });
         }
