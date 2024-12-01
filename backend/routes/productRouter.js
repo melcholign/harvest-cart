@@ -2,11 +2,12 @@ import express from 'express';
 import { ProductController } from '../controllers/productController.js';
 import { StoreModel } from '../models/storeModel.js';
 import { ProductModel } from '../models/product-model.js';
-import { Store } from 'express-session';
 import fs from 'fs';
-
-// configuring multer
 import multer from 'multer';
+
+/**
+ * Multer storage configuration for uploading images.
+ */
 const storage = multer.diskStorage({
     destination: function(req, file, cb){
       let path;
@@ -41,26 +42,58 @@ const imageUpload = upload.single('thumbnail');
 const productRouter = express.Router();
 
 // Protected Dynamic routes
+
+/**
+ * Render the page for adding a new product.
+ */
 productRouter.get('/:storeId/product/add', checkAuthenticated, checkOwnership, async (req, res) => {
   res.render("productAdd.ejs", {store: res.locals.store});
 })
+
+/**
+ * Add a new product.
+ */
 productRouter.post('/:storeId/product/add', checkAuthenticated, checkOwnership, imageUpload, ProductController.add);
 
+/**
+ * Render the page for updating a product.
+ */
 productRouter.get('/:storeId/product/:productId/update', checkAuthenticated, checkOwnership, (req, res) => {
   res.render('updateProduct.ejs', { product: res.locals.product });
 })
+
+/**
+ * Update a product.
+ */
 productRouter.post('/:storeId/product/:productId/update', checkAuthenticated, checkOwnership, imageUpload, ProductController.update);
 
+/**
+ * Delete a product.
+ */
 productRouter.post('/:storeId/product/:productId/delete', checkAuthenticated, checkOwnership, ProductController.delete);
 
 
 // middlewares
+/**
+ * Middleware to check if the user is authenticated.
+ * @param {Object} req - The request object.
+ * @param {Object} res - The response object.
+ * @param {Function} next - The next middleware function.
+ */
 function checkAuthenticated(req, res, next) {
   if (req.isAuthenticated()) {
     return next();
   }
   res.redirect('/farmer/login');
 }
+
+/**
+ * Middleware to check store ownership and product ownership if applicable.
+ * @param {Object} req - The request object.
+ * @param {Object} res - The response object.
+ * @param {Function} next - The next middleware function.
+ * @throws {Error} If the store or product does not exist or the user is not the owner.
+ */
 async function checkOwnership(req, res, next){
   try{
       const store = await StoreModel.getByID(req.params.storeId);

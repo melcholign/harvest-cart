@@ -3,9 +3,11 @@ import { FarmerController } from '../controllers/farmerController.js';
 import { passport } from '../middlewares/passport/passport-config.js';
 import { FarmerModel } from '../models/farmerModel.js';
 import fs from 'fs';
-
-// configuring multer
 import multer from 'multer';
+
+/**
+ * Multer storage configuration for uploading images.
+ */
 const storage = multer.diskStorage({
     destination: function(req, file, cb){
       let path;
@@ -42,14 +44,27 @@ const imageUpload = upload.fields([{ name: 'nid', maxCount: 1 }, { name: 'pfp', 
 const farmerRouter = express.Router();
 
 // Public routes
+/**
+ * Render the registration page.
+ */
 farmerRouter.get('/register', checkNotAuthenticated, (req, res) => {
   res.render("register.ejs");
 })
+/**
+ * Register a new farmer.
+ */
 farmerRouter.post('/register', checkNotAuthenticated, prepImgUpload, imageUpload, FarmerController.register);
 
+/**
+ * Render the login page.
+ */
 farmerRouter.get('/login', checkNotAuthenticated, (req, res) => {
   res.render('login.ejs');
 });
+
+/**
+ * Authenticate and login a farmer.
+ */
 farmerRouter.post('/login', checkNotAuthenticated, passport.authenticate('local-farmer', {
   successRedirect: '/farmer',
   failureRedirect: '/farmer/login',
@@ -57,6 +72,9 @@ farmerRouter.post('/login', checkNotAuthenticated, passport.authenticate('local-
 }));
 
 // Protected routes
+/**
+ * Render the farmer dashboard.
+ */
 farmerRouter.get('', checkAuthenticated, async (req, res) => {
   console.log(await FarmerModel.getStores(req.user.farmerId));
   res.render('index.ejs', {
@@ -64,11 +82,23 @@ farmerRouter.get('', checkAuthenticated, async (req, res) => {
     farmer: req.user
   })
 })
+/**
+ * Render the update farmer page.
+ */
 farmerRouter.get('/update', checkAuthenticated, (req, res) => {
   res.render('updateFarmer.ejs', { farmer: req.user });
 })
+/**
+  * Update a farmer's information.
+  */
 farmerRouter.post('/update', checkAuthenticated, imageUpload, FarmerController.update);
+/**
+  * Delete a farmer account.
+  */
 farmerRouter.post('/delete', checkAuthenticated, FarmerController.delete);
+/**
+  * Logout a farmer.
+  */
 farmerRouter.post("/logout", (req, res) => {
   req.logout((err) => {
     if (err) { return next(err); }
@@ -76,18 +106,38 @@ farmerRouter.post("/logout", (req, res) => {
   res.redirect('/farmer/login');
 })
 
+
+/**
+ * Middleware to check if the user is authenticated.
+ * @param {Object} req - The request object.
+ * @param {Object} res - The response object.
+ * @param {Function} next - The next middleware function.
+ */
 function checkAuthenticated(req, res, next) {
   if (req.isAuthenticated()) {
     return next();
   }
   res.redirect('/farmer/login');
 }
+/**
+ * Middleware to check if the user is not authenticated.
+ * @param {Object} req - The request object.
+ * @param {Object} res - The response object.
+ * @param {Function} next - The next middleware function.
+ */
 function checkNotAuthenticated(req, res, next) {
   if (req.isAuthenticated()) {
     return res.redirect('/farmer');
   }
   next();
 }
+
+/**
+ * Middleware to prepare image upload by setting a unique folder name.
+ * @param {Object} req - The request object.
+ * @param {Object} res - The response object.
+ * @param {Function} next - The next middleware function.
+ */
 function prepImgUpload(req, res, next){
   req.uniqueFarmerFolderName = Date.now() + '-' + Math.round(Math.random() * 1e9);
   return next();
