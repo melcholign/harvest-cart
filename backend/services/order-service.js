@@ -2,6 +2,7 @@ import { pool } from '../db/pool.js';
 import { OrderModel } from '../models/order-model.js';
 import { CheckoutModel } from '../models/checkout-model.js';
 import { OrderSimulationModel } from '../models/order-simulation-model.js';
+import { PaymentModel } from '../models/payment-model.js';
 import { CheckoutService } from './checkout-service.js';
 
 class OrderService {
@@ -12,7 +13,7 @@ class OrderService {
 
         const hasCompletedCheckout = await CheckoutService.isComplete(customerId);
 
-        if(!hasCompletedCheckout)  {
+        if (!hasCompletedCheckout) {
             throw new Error('Checkout must be completed before creating an order');
         }
 
@@ -23,6 +24,11 @@ class OrderService {
         );
 
         await OrderSimulationModel.createOrderSimulation(connection, orderId);
+
+        const paymentInfo = await PaymentModel.getPaymentInformation(connection, checkout.paymentId);
+        if (paymentInfo.paymentMethod === 'digital') {
+            await PaymentModel.makePayment(connection, checkout.paymentId);
+        }
 
         await connection.commit();
         await connection.release();
