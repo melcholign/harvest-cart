@@ -1,42 +1,42 @@
 <h1>Edit</h1>
-<form action="/farmer/update" method="POST">
+<form action="/farmer/update" method="POST" enctype="multipart/form-data">
   <div>
     <label for="firstname">firstname</label>
-    <input type="text" id="firstname" name="firstname" value=<%=farmer.firstname %> required>
+    <input type="text" id="firstname" name="firstname" value="<%=farmer.firstname %>" required>
   </div>
   <div>
     <label for="lastname">lastname</label>
-    <input type="text" id="lastname" name="lastname" value=<%=farmer.lastname %> required>
+    <input type="text" id="lastname" name="lastname" value="<%=farmer.lastname %>" required>
   </div>
   <div>
     <label for="female">Female</label>
-    <input type="radio" id="female" name="gender" value="female" checked=<%= (farmer.gender == 'female') ? 'checked' : '' ;%> >
+    <input type="radio" id="female" name="gender" value="female" <% if(farmer.gender == 'female'){ %> <%= 'checked' %> <% } %> >
     <label for="male">Male</label>
-    <input type="radio" id="male" name="gender" value="male" checked=<%= (farmer.gender == 'male') ? 'checked' : '' ;%>>
+    <input type="radio" id="male" name="gender" value="male" <% if(farmer.gender == 'male'){ %> <%= 'checked' %> <% } %> >
   </div>
   <div>
     <label for="dob">Date of birth</label>
-    <input type="date" id="dob" name="dob" value=<%=farmer.dob.toISOString().split('T')[0] %> required>
+    <input type="date" id="dob" name="dob" value="<%=farmer.dob.toISOString().split('T')[0] %>" required>
   </div>
   <div>
     <label for="mobile">mobile</label>
-    <input type="number" id="mobile" name="mobile" value=<%=farmer.mobile %> required>
+    <input type="number" id="mobile" name="mobile" value="<%=farmer.mobile %>" required>
   </div>
   <div>
     <label for="address">address</label>
-    <input type="text" id="address" name="address" value=<%=farmer.address %> required>
+    <textarea id="address" name="address" required><%=farmer.address %></textarea>
   </div>
   <div>
-    <label for="nid">nid</label>
-    <input type="text" id="nid" name="nid" value=<%=farmer.nid_img_path %> required>
+    <label for="nid_img">nid_img</label>
+    <input type="file" id="nid_img" name="nid" />
   </div>
   <div>
-    <label for="pfp">pfp</label>
-    <input type="text" id="pfp" name="pfp" value=<%=farmer.pfp_img_path %> required>
+    <label for="pfp_img">pfp_img</label>
+    <input type="file" id="pfp_img" name="pfp" />
   </div>
   <div>
     <label for="email">email</label>
-    <input type="email" id="email" name="email" value=<%=farmer.email %> required>
+    <input type="email" id="email" name="email" value="<%=farmer.email %>" required>
   </div>
   <div>
     <label for="password">password</label>

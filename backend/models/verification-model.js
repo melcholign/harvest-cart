@@ -12,7 +12,7 @@ CREATE TABLE IF NOT EXISTS Verification (
     expiryAt TIMESTAMP DEFAULT (CURRENT_TIMESTAMP + INTERVAL 1 HOUR),
 
     PRIMARY KEY (customerId, purpose),
-    FOREIGN KEY (customerId) REFERENCES Customer(id)
+    FOREIGN KEY (customerId) REFERENCES Customer(customerId)
 )
 `
 await pool.query(schema);

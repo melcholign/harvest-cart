@@ -14,8 +14,8 @@ async function authenticateFarmer(email, password, done) {
             return done(null, false, { message: "Email or password incorrect." });
         }
 
-        console.log("FarmerID: " + farmer.farmer_id);
-        if (!(await bcryptjs.compare(password, farmer.pass_hash))) {
+        console.log("FarmerID: " + farmer.farmerId);
+        if (!(await bcryptjs.compare(password, farmer.passHash))) {
             console.log("Password NOT correct!");
             return done(null, false, { message: "Email or password incorrect." });
         }

@@ -1,11 +1,15 @@
 import { pool } from '../db/pool.js';
 import { loadSchema } from '../utils/schema-loader.js';
 
+
+/**
+ * SQL schema for the 'Product' table.
+ */
 const schema =
     `
 CREATE TABLE IF NOT EXISTS Product (
     productId INT NOT NULL AUTO_INCREMENT,
-    -- storeId INT NOT NULL,
+    storeId INT NOT NULL,
 
     productName VARCHAR(50) NOT NULL,
     description VARCHAR(1000),
@@ -24,8 +28,9 @@ CREATE TABLE IF NOT EXISTS Product (
     dateCreated TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     dateUpdated TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
 
-    PRIMARY KEY(productId)
-    -- FOREIGN KEY(storeId) REFERENCES store(storeId),
+    PRIMARY KEY(productId),
+    FOREIGN KEY(storeId) REFERENCES store(storeId) ON DELETE CASCADE,
+    UNIQUE KEY product_AK (productName, storeId)
 );
 `
 await loadSchema(pool, schema, 'Product');
@@ -76,16 +81,22 @@ class ProductModel {
     }
 
 
+    /**
+     * Search products by name.
+     * @param {string} searchString - The name search string.
+     * @returns {Promise<Array<Object>>} List of matching products.
+     * @throws {Error} If query fails.
+     */
     static async searchByName(search_string){
         const query =
         `SELECT *
         FROM product p
-        WHERE p.product_name LIKE '%${search_string}%'
+        WHERE p.productName LIKE '%${search_string}%'
         ORDER BY
           CASE
-            WHEN p.product_name LIKE '${search_string}' THEN 0
-            WHEN p.product_name LIKE '${search_string}%' THEN 1
-            WHEN p.product_name LIKE '%${search_string}' THEN 2
+            WHEN p.productName LIKE '${search_string}' THEN 0
+            WHEN p.productName LIKE '${search_string}%' THEN 1
+            WHEN p.productName LIKE '%${search_string}' THEN 2
             ELSE 3
           END`;
 
@@ -98,6 +109,12 @@ class ProductModel {
         }
     }
 
+    /**
+     * Search products by categories.
+     * @param {Array<string>} categories - The list of categories.
+     * @returns {Promise<Array<Object>>} List of matching products.
+     * @throws {Error} If query fails.
+     */
     static async searchByCategories(categories){
 
         let conditionString = `p.category = '` + categories[0] + `' `;
@@ -120,11 +137,43 @@ class ProductModel {
         }
     }
 
-    static async getByStore(store_id){
+
+    /**
+     * Get a product by ID.
+     * @param {number} productId - The ID of the product.
+     * @returns {Promise<Object>} The product object.
+     * @throws {Error} If query fails.
+     */
+    static async getByID(productId) {
         const query =
-        `SELECT *
-        FROM product p
-        WHERE p.store_id = ${store_id};`;
+            `SELECT *
+        FROM product
+        WHERE productId = ${productId};`;
+
+        try {
+            const [results, fields] = await pool.query(query);
+            return results[0];
+        } catch (err) {
+            console.log("Error executing query:" + err);
+            throw err;
+        }
+    }
+
+    /**
+     * Add a new product.
+     * @param {number} storeId - The ID of the store.
+     * @param {string} category - The category of the product.
+     * @param {string} productName - The name of the product.
+     * @param {string} description - The description of the product.
+     * @param {number} price - The price of the product.
+     * @param {string} thumbnailImgPath - Path to the thumbnail image.
+     * @returns {Promise<Object>} Result of the addition.
+     * @throws {Error} If query fails.
+     */
+    static async add(storeId, category ,productName, description, price, thumbnailImgPath){
+        const query =
+        `INSERT INTO product (storeId, category ,productName, description, price, thumbnailImgPath)
+        VALUES ('${storeId}', '${category}', '${productName}', '${description}', '${price}', '${thumbnailImgPath}');`;
 
         try{
             const [results, fields] = await pool.query(query);
@@ -135,31 +184,26 @@ class ProductModel {
         }
     }
 
-    static async add(store_id, category_id ,product_name, description, price, thumbnail_img_path){
-        const query =
-        `INSERT INTO product (store_id, category_id ,product_name, description, price, thumbnail_img_path)
-        VALUES ('${store_id}', '${category_id}', '${product_name}', '${description}', '${price}', '${thumbnail_img_path}');`;
 
-        try{
-            const [results, fields] = await pool.query(query);
-            return results;
-        } catch(err){
-            console.log("Error executing query:" + err);
-            throw err;
-        }
-    }
-
-
-    static async update(product_id, store_id, category_id ,product_name, description, price){
-        // NOTE: no parameter for thumbnail_img_path as path remains same, just img on path is replaced by controller
+    /**
+     * Update a product's information.
+     * @param {number} productId - The ID of the product.
+     * @param {string} category - The category of the product.
+     * @param {string} productName - The name of the product.
+     * @param {string} description - The description of the product.
+     * @param {number} price - The price of the product.
+     * @returns {Promise<Object>} Result of the update.
+     * @throws {Error} If query fails.
+     */
+    static async update(productId, category ,productName, description, price){
+        // NOTE: no parameter for thumbnailImgPath as path remains same, just img on path is replaced by controller
         const query =
         `UPDATE product
-         SET store_id = '${store_id}',
-             category_id = '${category_id}',
-             product_name = '${product_name}',
+         SET category = '${category}',
+             productName = '${productName}',
              description = '${description}',
              price = '${price}'
-         WHERE product_id = ${product_id};`;
+         WHERE productId = ${productId};`;
 
          try{
             const [results, fields] = await pool.query(query);
@@ -170,10 +214,16 @@ class ProductModel {
         }
     }
 
-    static async delete(product_id){
+    /**
+     * Delete a product by ID.
+     * @param {number} productId - The ID of the product.
+     * @returns {Promise<Object>} Result of the deletion.
+     * @throws {Error} If query fails.
+     */
+    static async delete(productId){
         const query =
         `DELETE FROM product
-         WHERE product_id = ${product_id};`
+         WHERE productId = ${productId};`
 
          try{
             const [results, fields] = await pool.query(query);

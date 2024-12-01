@@ -1,8 +1,8 @@
 <h1>Register</h1>
-<form action="/farmer/register" method="POST">
+<form action="/farmer/register" method="POST" enctype="multipart/form-data">
   <div>
     <label for="firstname">firstname</label>
-    <input type="text" id="firstname" name="firstname" required>
+    <input type="text" id="firstname" name="firstname">
   </div>
   <div>
     <label for="lastname">lastname</label>
@@ -27,12 +27,12 @@
     <input type="text" id="address" name="address" required>
   </div>
   <div>
-    <label for="nid">nid</label>
-    <input type="text" id="nid" name="nid" required>
+    <label for="nid_img">nid_img</label>
+    <input type="file" id="nid_img" name="nid" />
   </div>
   <div>
-    <label for="pfp">pfp</label>
-    <input type="text" id="pfp" name="pfp" required>
+    <label for="pfp_img">pfp_img</label>
+    <input type="file" id="pfp_img" name="pfp" />
   </div>
   <div>
     <label for="email">email</label>

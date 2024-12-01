@@ -1,0 +1,71 @@
+<h1>Add Product</h1>
+<form action="/farmer/store/<%= store.storeId %>/product/add" method="POST" enctype="multipart/form-data">
+
+  
+  <input type="text" name="storeName" value="<%= store.storeName %>" hidden>
+
+  <div>
+    <label for="productName">product name</label>
+    <input type="text" id="product_name" name="productName" required>
+  </div>
+
+  <div>
+    <label for="fruits">fruits</label>
+    <input type="radio" id="fruits" name="category" value="fruits">
+
+    <label for="vegetables">vegetables</label>
+    <input type="radio" id="vegetables" name="category" value="vegetables">
+
+    <label for="herbs">herbs</label>
+    <input type="radio" id="herbs" name="category" value="herbs">
+
+    <label for="dairy">dairy</label>
+    <input type="radio" id="dairy" name="category" value="dairy">
+
+    <label for="poultry">poultry</label>
+    <input type="radio" id="poultry" name="category" value="poultry">
+
+    <label for="seafood">seafood</label>
+    <input type="radio" id="seafood" name="category" value="seafood">
+
+    <label for="red meat">red meat</label>
+    <input type="radio" id="red meat" name="category" value="red meat">
+
+    <label for="fish">fish</label>
+    <input type="radio" id="fish" name="category" value="fish">
+
+    <label for="grains">grains</label>
+    <input type="radio" id="grains" name="category" value="grains">
+
+    <label for="condiments">condiments</label>
+    <input type="radio" id="condiments" name="category" value="condiments">
+
+    <label for="spices & seasonings">Female</label>
+    <input type="radio" id="spices & seasonings" name="category" value="spices & seasonings">
+
+    <label for="miscellaneous">miscellaneous</label>
+    <input type="radio" id="miscellaneous" name="category" value="miscellaneous" checked>
+  </div>
+
+  <div>
+    <label for="description">description</label>
+    <textarea id="description" name="description"></textarea>
+  </div>
+  
+  <div>
+    <label for="price">price</label>
+    <input type="number" id="price" name="price" required>
+  </div>
+
+  <div>
+    <label for="thumbnailImg">thumbnailImg</label>
+    <input type="file" id="thumbnailImg" name="thumbnail" required>
+  </div>
+
+  <!--
+  <input type="text" name="storeId" value=<%= store.storeId %> hidden>
+  -->
+
+  <button type="submit">Add</button>
+</form>
+<a href="/farmer/store/<%= store.storeId %>">Cancel</a>

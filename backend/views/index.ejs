@@ -1,12 +1,37 @@
-<h1>Hi <%= name %></h1>
-<form action="/farmer/logout" method="POST">
-  <button type="submit">Log Out</button>
-</form>
+<h1>Hi <%= farmer.firstname + ' ' + farmer.lastname %></h1>
 
-<form action="/farmer/delete" method="POST">
-  <button type="submit">Delete</button>
-</form>
+<div>
+  <h3>pfp Image:</h3>
+  <img src="/<%= farmer.pfpImgPath %>" alt="pfp_img" width="200" height="125">
+  <h3>nid Image:</h3>
+  <img src="/<%= farmer.nidImgPath %>" alt="nid_img" width="200" height="125">
+</div>
 
-<form action="/farmer/update" method="GET">
-  <button type="submit">Edit</button>
-</form>
+<div>
+  <form action="/farmer/logout" method="POST">
+    <button type="submit">Log Out</button>
+  </form>
+
+  <form action="/farmer/delete" method="POST">
+    <button type="submit">Delete</button>
+  </form>
+
+  <form action="/farmer/update" method="GET">
+    <button type="submit">Edit</button>
+  </form>
+
+  <form action="/farmer/store/add" method="GET">
+    <button type="submit">Add Store</button>
+  </form>
+</div>
+
+<% for(let i = 0; i < stores.length; i++){ %>
+  <div>
+    <h3><%= i %>. Name:<%= stores[i].storeName %>  Rating:<%= stores[i].rating %> Open:<%= stores[i].isOpen %></h3>
+    <form action="/farmer/store/<%= stores[i].storeId %>" method="GET">
+      <img src="<%= stores[i].coverImgPath %>" alt="cover image" width="200" height="125">
+      <button type="submit">Check</button>
+    </form>
+    <hr>
+  </div>
+<% } %>
