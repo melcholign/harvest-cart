@@ -9,11 +9,19 @@ const storage = multer.diskStorage({
     destination: function(req, file, cb){
       let path;
       if(file.fieldname == 'cover'){
-        path = 'src/farmer/' + req.user.farmer_id + '/store/' + req.body.store_name + '/';
+        if(!req.store){
+          path = 'src/farmer/' + req.user.farmer_id + '/store/' + req.uniqueStoreFolderName + '/';
+        } else{
+          path = req.store.cover_img_path.replace('cover.jpg','');
+        }
       } else if(file.fieldname == 'gallery'){
-        path = 'src/farmer/' + req.user.farmer_id + '/store/' + req.body.store_name + '/gallery/';
+        if(!req.store){
+          path = 'src/farmer/' + req.user.farmer_id + '/store/' + req.uniqueStoreFolderName + '/gallery/';
+        }else{
+          path = req.store.gallery_imgs_path;
+        }
         if(req.galleryImgCounter == 0 && fs.existsSync(path)){
-          fs.rmSync(path, { recursive: true, force: true });;
+          fs.rmSync(path, { recursive: true, force: true });
         }
       } else{
         console.log('File fieldnames not matching for store image fields! NOTE: views file input tags name attribute should be gallery and cover');
@@ -46,14 +54,14 @@ const storeRouter = express.Router();
 storeRouter.get('/add', checkAuthenticated, (req, res) => {
   res.render("storeAdd.ejs");
 })
-storeRouter.post('/add', checkAuthenticated, setGalleryImgCounter, imageUpload, StoreController.add);
+storeRouter.post('/add', checkAuthenticated, prepImgUpload, imageUpload, StoreController.add);
 
 
 //dynamic routes
 storeRouter.get('/:storeId/update', checkAuthenticated, checkOwnership, (req, res) => {
   res.render('updateStore.ejs', { store: res.locals.store });
 })
-storeRouter.post('/:storeId/update', checkAuthenticated, checkOwnership, setGalleryImgCounter, imageUpload, StoreController.update);
+storeRouter.post('/:storeId/update', checkAuthenticated, checkOwnership, prepImgUpload, imageUpload, StoreController.update);
 //storeRouter.post('/:storeId/delete', checkAuthenticated, StoreController.delete);
 storeRouter.get('/:storeId', checkAuthenticated, checkOwnership, StoreController.enterStore);
 
@@ -75,6 +83,7 @@ async function checkOwnership(req, res, next){
       if(store.farmer_id != req.user.farmer_id){
           return res.json({ message: 'Access denied!'});
       }
+      req.store = store;
       res.locals.store = store;
       return next();
   }catch(err){
@@ -83,7 +92,8 @@ async function checkOwnership(req, res, next){
   }
 }
 
-function setGalleryImgCounter(req, res, next){
+function prepImgUpload(req, res, next){
+  req.uniqueStoreFolderName = Date.now() + '-' + Math.round(Math.random() * 1e9);
   req.galleryImgCounter = 0;
   return next();
 }

@@ -11,7 +11,7 @@ const storage = multer.diskStorage({
     destination: function(req, file, cb){
       let path;
       if(file.fieldname == 'thumbnail'){
-        path = 'src/farmer/' + req.user.farmer_id + '/store/' + req.body.store_name + '/product/';
+        path =  req.store.gallery_imgs_path.replace('gallery','product');
       } else{
         console.log('File fieldnames not matching for store image fields! NOTE: views file input tags name attribute should be gallery and cover');
       }
@@ -24,7 +24,12 @@ const storage = multer.diskStorage({
     },
     filename: function(req, file, cb){
         if(file.fieldname == 'thumbnail'){
-          cb(null, req.body.productName + '.jpg');
+          if(!req.product){
+            req.uniqueProductName = Date.now() + '-' + Math.round(Math.random() * 1e9);
+            cb(null, req.uniqueProductName + '.jpg');
+          }else{
+            cb(null, /^.*\/(.*\.jpg)$/.exec(req.product.thumbnailImgPath).at(1));
+          }
         } else{
           console.log('File fieldnames not matching for store image fields! NOTE: views file input tags name attribute should be gallery and cover');
         }
@@ -65,6 +70,7 @@ async function checkOwnership(req, res, next){
       if(store.farmer_id != req.user.farmer_id){
           return res.json({ message: 'Access denied!'});
       }
+      req.store = store;
       res.locals.store = store;
 
       if(req.params.productId){
@@ -75,6 +81,7 @@ async function checkOwnership(req, res, next){
         if(product.storeId != res.locals.store.storeId){
           return res.json({ message: 'This product does not belong to this store!'});
         }
+        req.product = product;
         res.locals.product = product;
       }
       return next();

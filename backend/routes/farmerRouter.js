@@ -9,13 +9,8 @@ import multer from 'multer';
 const storage = multer.diskStorage({
     destination: function(req, file, cb){
       let path;
-      if(file.fieldname == 'nid'){
-        path = 'src/farmer/' + req.user.farmer_id + '/store/' + req.body.store_name + '/';
-      } else if(file.fieldname == 'gallery'){
-        path = 'src/farmer/' + req.user.farmer_id + '/store/' + req.body.store_name + '/gallery/';
-        if(req.galleryImgCounter == 0 && fs.existsSync(path)){
-          fs.rmSync(path, { recursive: true, force: true });;
-        }
+      if(file.fieldname == 'nid' || file.fieldname == 'pfp'){
+        path = 'src/farmer/' + req.user.farmer_id + '/';
       } else{
         console.log('File fieldnames not matching for store image fields! NOTE: views file input tags name attribute should be gallery and cover');
       }
@@ -24,22 +19,20 @@ const storage = multer.diskStorage({
       if(!fs.existsSync(path)){
         fs.mkdirSync(path, { recursive: true });
       }
-      
       cb(null, path);
     },
     filename: function(req, file, cb){
-        if(file.fieldname == 'cover'){
-          cb(null, 'cover.jpg');
-        } else if(file.fieldname == 'gallery'){
-          //const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1e9);
-          cb(null, (req.galleryImgCounter++) + '.jpg');
+        if(file.fieldname == 'nid'){
+          cb(null, 'nid.jpg');
+        } else if(file.fieldname == 'pfp'){
+          cb(null, 'pfp.jpg');
         } else{
           console.log('File fieldnames not matching for store image fields! NOTE: views file input tags name attribute should be gallery and cover');
         }
     }
 });
 const upload = multer( {storage: storage} );
-const imageUpload = upload.fields([{ name: 'cover', maxCount: 1 }, { name: 'gallery', maxCount: 8 }])
+const imageUpload = upload.single('thumbnail');
 
 
 const farmerRouter = express.Router();
