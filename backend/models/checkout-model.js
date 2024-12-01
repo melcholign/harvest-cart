@@ -191,6 +191,7 @@ class CheckoutModel {
                 customerId: item.customerId,
                 shippingAddress: item.shippingAddress,
                 paymentId: item.paymentId,
+                amount: item.amount,
                 items: [
                     ...partialCheckout.items,
                     {
@@ -256,7 +257,6 @@ class CheckoutModel {
 // console.log(await CheckoutModel.createSession(pool, 1, basketItems));
 // console.log(await CheckoutModel.abortSession(pool, 1));
 // await CheckoutModel.setPaymentId(pool, 1, 3);
-// console.log(await CheckoutModel.settleSession(pool, 1));
 
 export {
     CheckoutModel,

@@ -52,6 +52,8 @@ class OrderModel {
             customerId, paymentId, shippingAddress, orderTotal
         ]);
 
+        console.log(orderId);
+
         const flattenedOrderItems = [];
         const placeholderTuples = [];
         for (let orderItem of orderItems) {
