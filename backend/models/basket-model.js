@@ -1,9 +1,15 @@
-import { loadSchema } from '../utils/schema-loader.js';
+/**
+ * @module basket-model.js
+ */
+
 import { pool } from '../db/pool.js';
 import mysql from 'mysql2';
 
-const schema =
-    `
+/**
+ * SQL schema for the Basket table.
+ * @type {string}
+ */
+const schema = `
 CREATE TABLE IF NOT EXISTS Basket (
     customerId INT NOT NULL,
     productId INT NOT NULL,
@@ -13,37 +19,25 @@ CREATE TABLE IF NOT EXISTS Basket (
     FOREIGN KEY(customerId) REFERENCES Customer(customerId),
     FOREIGN KEY(productId) REFERENCES Product(productId)
 )
-`
-
-// await loadSchema(connection, schema, 'Basket');
+`;
 
 /**
- * @classdesc Model representing a basket that a customer 
- * carries to temporarily hold the products 
- * that they want to order.
+ * @classdesc Model representing a customer's basket, which holds products
+ * that they intend to order.
  */
 class BasketModel {
     /**
+     * Retrieves a customer's basket with product details.
      * @async
      * @method getBasket
-     * @description retrieve a customer's basket of products 
-     * that they intend to order
-     * 
-     * @param {mysql.Connection} connection - database connection
-     * @param {Number} customerId - identifies the customer 
-     * @returns {Array.<Object>} - list of objects, 
-     * each containing a product's id, name, category, 
-     * quantity in basket, unit price, and aggregate price, 
-     * that represents a customer's basket  
+     * @param {mysql.Connection} connection - The database connection.
+     * @param {Number} customerId - The customer's unique identifier.
+     * @returns {Array.<Object>} - List of products in the basket, with details like name, category, quantity, unit price.
      */
     static async getBasket(connection, customerId) {
-        const query =
-            'SELECT '
-            + 'Basket.productId AS id, '
-            + 'Product.productName AS name, '
+        const query = 'SELECT Basket.productId AS id, Product.productName AS name, '
             + 'COALESCE(Product.category, \'miscellaneous\') AS category, '
-            + 'Basket.productQuantity AS quantity, '
-            + 'Product.price AS unitPrice '
+            + 'Basket.productQuantity AS quantity, Product.price AS unitPrice '
             + 'FROM Basket JOIN Product ON Basket.productId = Product.productId '
             + 'WHERE Basket.customerId = ?';
         const [results] = await connection.query(query, [customerId]);
@@ -52,14 +46,13 @@ class BasketModel {
     }
 
     /**
+     * Adds a product to the customer's basket if in stock.
      * @async
      * @method addProduct
-     * @description Adds the specified product (with quantity 1) to a customer's basket
-     * 
-     * @param {mysql.Connection} connection - database connection
-     * @param {Number} customerId - identifies a customer's basket
-     * @param {Number} productId - identifies a product
-     * @throws will throw an error if the product is out of stock
+     * @param {mysql.Connection} connection - The database connection.
+     * @param {Number} customerId - The customer's unique identifier.
+     * @param {Number} productId - The product's unique identifier.
+     * @throws {Error} - Throws if product is out of stock or already in the basket.
      */
     static async addProduct(connection, customerId, productId) {
         const query = 'INSERT INTO Basket(customerId, productId) '
@@ -74,7 +67,7 @@ class BasketModel {
             }
         } catch (err) {
             if (err.code === 'ER_DUP_ENTRY') {
-                throw new Error('product already added', { cause: 'duplicate' })
+                throw new Error('product already added', { cause: 'duplicate' });
             }
 
             throw err;
@@ -82,15 +75,13 @@ class BasketModel {
     }
 
     /**
+     * Removes a product from the customer's basket.
      * @async
      * @method removeProduct
-     * @description removes a product from a customer's basket
-     * 
-     * @param {mysql.Connection} connection - database connection
-     * @param {Number} customerId - identifies the customer
-     * @param {Number} productId - identifies the product
-     * 
-     * @throws an error when there is no product to remove
+     * @param {mysql.Connection} connection - The database connection.
+     * @param {Number} customerId - The customer's unique identifier.
+     * @param {Number} productId - The product's unique identifier.
+     * @throws {Error} - Throws if the product is not in the basket.
      */
     static async removeProduct(connection, customerId, productId) {
         const query = 'DELETE FROM Basket WHERE customerId = ? AND productId = ?';
@@ -102,37 +93,30 @@ class BasketModel {
     }
 
     /**
+     * Retrieves the quantity of a product in the customer's basket.
      * @async
      * @method getQuantity
-     * @description gets the quantity of a product in 
-     * a customer's basket
-     * 
-     * @param {mysql.Connection} connection - database connection
-     * @param {Number} customerId
-     * @param {Number} productId
-     * @returns {Number} quantity - the quantity of the product in
-     * the customer's basket. Returns 0, if there is no such product in it.  
+     * @param {mysql.Connection} connection - The database connection.
+     * @param {Number} customerId - The customer's unique identifier.
+     * @param {Number} productId - The product's unique identifier.
+     * @returns {Number} - The quantity of the product in the basket.
      */
     static async getQuantity(connection, customerId, productId) {
         const query = 'SELECT productQuantity FROM Basket '
             + 'WHERE customerId = ? AND productId = ?';
-        console.time('getQuantity');
         const [results] = await connection.query(query, [customerId, productId]);
-        console.timeEnd('getQuantity');
         return results[0]?.productQuantity || 0;
     }
 
     /**
+     * Updates the quantity of a product in the customer's basket.
      * @async
      * @method setQuantity
-     * @description sets the quantity of a product item that a customer has added their basket
-     * 
-     * @param {mysql.Connection} connection - database connection
-     * @param {Number} customerId 
-     * @param {Number} productId 
-     * @param {Number} newQuantity 
-     * 
-     * @throws an error if newQuantity < 0, and newQuantity > stockQuantity
+     * @param {mysql.Connection} connection - The database connection.
+     * @param {Number} customerId - The customer's unique identifier.
+     * @param {Number} productId - The product's unique identifier.
+     * @param {Number} newQuantity - The new quantity for the product.
+     * @throws {Error} - Throws if the quantity is invalid or exceeds stock.
      */
     static async setQuantity(connection, customerId, productId, newQuantity) {
         if (newQuantity < 0) {
@@ -158,22 +142,20 @@ class BasketModel {
     }
 
     /**
+     * Calculates the aggregate price of a product in the basket.
      * @async
      * @method getAggregatePrice
-     * @description calculates the aggregate price derived from a product's unit
-     *  price and its quantity in a customer's basket
-     * 
-     * @param {mysql.Connection} connection - database connection
-     * @param {Number} customerId - identifies the customer's basket
-     * @param {Number} productId - identifies the product in the basket
-     * @returns {Number} - aggregate price = unit price * quantity
+     * @param {mysql.Connection} connection - The database connection.
+     * @param {Number} customerId - The customer's unique identifier.
+     * @param {Number} productId - The product's unique identifier.
+     * @returns {Number} - The aggregate price (unit price * quantity).
+     * @throws {Error} - Throws if the product is not in the basket.
      */
     static async getAggregatePrice(connection, customerId, productId) {
         const query = 'SELECT Basket.productQuantity, Product.price FROM Basket '
             + 'JOIN Product ON Basket.productId = Product.productId '
             + 'WHERE customerId = ? AND Product.productId = ?';
         const [results] = await connection.query(query, [customerId, productId]);
-        console.log(results);
 
         if (results.length === 0) {
             throw new Error(
@@ -183,21 +165,19 @@ class BasketModel {
         }
 
         const product = results[0];
-        const aggregatePrice = product.productQuantity * product.price;
-
-        return aggregatePrice;
+        return product.productQuantity * product.price;
     }
 
     /**
+     * Clears a customer's basket.
+     * @async
      * @method clearBasket
-     * @description clears a customer's basket off of products
-     * 
-     * @param {mysql.Connection} connection - database connection
-     * @param {Number} customerId - identifies the customer
+     * @param {mysql.Connection} connection - The database connection.
+     * @param {Number} customerId - The customer's unique identifier.
+     * @throws {Error} - Throws if the basket is already empty.
      */
     static async clearBasket(connection, customerId) {
         const query = 'DELETE FROM Basket WHERE customerId = ?';
-
         const [result] = await connection.query(query, [customerId]);
 
         if (result.affectedRows == 0) {

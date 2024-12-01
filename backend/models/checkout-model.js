@@ -7,6 +7,10 @@ import { loadSchema } from '../utils/schema-loader.js';
 import { BasketModel } from './basket-model.js';
 import mysql from 'mysql2';
 
+/**
+ * SQL schema for the Checkout table.
+ * @type {string}
+ */
 const checkoutSchema = `
 CREATE TABLE IF NOT EXISTS Checkout (
     customerId INT NOT NULL,
@@ -14,19 +18,20 @@ CREATE TABLE IF NOT EXISTS Checkout (
     shippingAddress VARCHAR(255) NULL,
     amount NUMERIC(15,2) NOT NULL,
     createdAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-
     PRIMARY KEY(customerId),
     FOREIGN KEY(customerId) REFERENCES Customer(customerId)
-    -- FOREIGN KEY(paymentId) REFERENCES Payment(paymentId)
 )
 `;
 
+/**
+ * SQL schema for the CheckoutItem table.
+ * @type {string}
+ */
 const checkoutItemSchema = `
 CREATE TABLE IF NOT EXISTS CheckoutItem (
     customerId INT NOT NULL,
     productId INT NOT NULL,
     productQuantity INT NOT NULL,
-
     PRIMARY KEY(customerId, productId),
     FOREIGN KEY(customerId) REFERENCES Checkout(customerId) 
         ON DELETE CASCADE,
@@ -38,39 +43,33 @@ loadSchema(pool, checkoutSchema, 'Checkout');
 await loadSchema(pool, checkoutItemSchema, 'Checkout Item');
 
 /**
- * @hideconstructor
- * @classdesc Model representing the checkout process
+ * Model representing the checkout process.
+ * @class CheckoutModel
  */
 class CheckoutModel {
     /**
      * @typedef {Object} CheckoutItem
-     * @property {Number} productId
-     * @property {Number} productQuantity
+     * @property {Number} productId - The product's unique identifier.
+     * @property {Number} productQuantity - Quantity of the product.
      */
 
     /**
      * @typedef {Object} Checkout
-     * @property {Number} customerId
-     * @property {String} shippingAddress
-     * @property {Number} paymentId
-     * @property {CheckoutItem[]} items
+     * @property {Number} customerId - Unique identifier for the customer.
+     * @property {String} shippingAddress - Address for delivery.
+     * @property {Number} paymentId - Unique payment identifier.
+     * @property {CheckoutItem[]} items - List of items in the checkout session.
      */
 
-
     /**
-     * Creates a checkout session that indicates that the checkout process for
-     * the given customer is underway.
-     * 
-     * @param {mysql.Connection} connection - Database connection.
-     * @param {Number} customerId - Identifies the customer who is checking out.
-     * @param {Object[]} basketItems - Array of basket items.
-     * @param {Number} basketItems[].productId - Identifies the product 
-     * of an item.
-     * @param {Number} basketItems[].productQuantity - Specifies the quantity 
-     * of the product.
-     * @param {Number} basketItems[].aggregatePrice - used to calculate the amount for checkout
-     * @throws {Error} - When the checkout process is already running for a
-     * customer. 
+     * Creates a new checkout session for a customer with the provided basket items.
+     * @param {mysql.Connection} connection - The database connection.
+     * @param {Number} customerId - Customer's unique identifier.
+     * @param {Object[]} basketItems - The basket items to be checked out.
+     * @param {Number} basketItems[].productId - The product identifier.
+     * @param {Number} basketItems[].productQuantity - The quantity of the product.
+     * @param {Number} basketItems[].aggregatePrice - The total price for the item.
+     * @throws {Error} - Throws if no items are provided or if a session already exists.
      */
     static async createSession(connection, customerId, basketItems) {
         if (basketItems.length == 0) {
@@ -111,12 +110,10 @@ class CheckoutModel {
     }
 
     /**
-     * Retrieves customer's checkout session information
-     * 
-     * @param {mysql.Connection} connection - Database connection. 
-     * @param {Number} customerId - Identifies customer's checkout session. 
-     * @returns {Object} - Contains customer's ID (session identifier), 
-     * their shipping address, and the payment ID
+     * Retrieves a customer's checkout session.
+     * @param {mysql.Connection} connection - The database connection.
+     * @param {Number} customerId - Customer's unique identifier.
+     * @returns {Object} - The customer's checkout session details.
      */
     static async getSession(connection, customerId) {
         const getQuery = 'SELECT * FROM Checkout WHERE customerId = ?';
@@ -126,16 +123,11 @@ class CheckoutModel {
     }
 
     /**
-     * Aborts the checkout session of a customer if an order is
-     * not to be placed.
-     * 
-     * @param {mysql.Connection} connection - Database connection.
-     * @param {Number} customerId - Identifies customer who is checking out.
-     * @returns {CheckoutItem[]} - Array of items to checkout that consists of 
-     * pairs of product id and the quantity of a product. These items are
-     * expected to be used to restore the state of the basket that was checked
-     * out, and the inventory whose products were reserved for checkout.
-     * @throws {Error} - When a session does not exist for it to be aborted.
+     * Aborts the checkout session for a customer.
+     * @param {mysql.Connection} connection - The database connection.
+     * @param {Number} customerId - Customer's unique identifier.
+     * @returns {CheckoutItem[]} - The items that were in the checkout session.
+     * @throws {Error} - Throws if the session does not exist.
      */
     static async abortSession(connection, customerId) {
         const getCheckoutItemsQuery = 'SELECT productId, productQuantity '
@@ -155,16 +147,11 @@ class CheckoutModel {
     }
 
     /**
-     * Signifies the completion of the checkout process.
-     * 
-     * @param {mysql.Connection} connection - Database connection.
-     * @param {Number} customerId - Identifies customer who is checking out.
-     * @throws {Error} - When a session does not exist for it to be settled.
-     * @throws {Error} - When a shipping address has not been provided 
-     * in checkout.
-     * @throws {Error} - When the payment option has not been determined in
-     * checkout.
-     * @returns {Checkout} - Contains all information related to the checkout.
+     * Finalizes the checkout process for a customer.
+     * @param {mysql.Connection} connection - The database connection.
+     * @param {Number} customerId - Customer's unique identifier.
+     * @throws {Error} - Throws if the session is incomplete or missing required fields.
+     * @returns {Checkout} - The finalized checkout session details.
      */
     static async settleSession(connection, customerId) {
         const getCheckoutQuery = 'SELECT * FROM Checkout JOIN CheckoutItem '
@@ -206,14 +193,11 @@ class CheckoutModel {
     }
 
     /**
-     * Sets the shipping address of a customer during the checkout process.
-     * 
-     * @param {mysql.Connection} connection - Database connection.
-     * @param {Number} customerId - Identifies customer who is checking out.
-     * @param {String} shippingAddress - the address where the order will be 
-     * delivered once checkout is completed.
-     * @throws {Error} - When the checkout process is not occurring for shipping
-     * address to be accepted
+     * Sets the shipping address for a customer's checkout session.
+     * @param {mysql.Connection} connection - The database connection.
+     * @param {Number} customerId - Customer's unique identifier.
+     * @param {String} shippingAddress - The shipping address for delivery.
+     * @throws {Error} - Throws if the session does not exist.
      */
     static async setShippingAddress(connection, customerId, shippingAddress) {
         const updateQuery = 'UPDATE Checkout SET shippingAddress = ? '
@@ -225,21 +209,16 @@ class CheckoutModel {
         }
     }
 
-
     /**
-     * Sets the payment ID corresponding to the choice of payment method the
-     * customer makes during checkout
-     * 
-     * @param {mysql.Connection} connection - Database connection.
-     * @param {Number} customerId - Identifies customer who is checking out.
-     * @param {String} paymentId - The payment ID associated with the payment
-     * information provided by the customer 
-     * @throws {Error} - When the checkout process is not occurring for payment
-     * ID to be accepted.
+     * Sets the payment ID for a customer's checkout session.
+     * @param {mysql.Connection} connection - The database connection.
+     * @param {Number} customerId - Customer's unique identifier.
+     * @param {Number} paymentId - The payment identifier.
+     * @throws {Error} - Throws if the session does not exist.
      */
     static async setPaymentId(connection, customerId, paymentId) {
         const updateQuery = 'UPDATE Checkout SET paymentId = ? '
-            + 'WHERE customerId = ?'; // and paymentId is valid
+            + 'WHERE customerId = ?';
         const [result] = await connection.query(updateQuery, [paymentId, customerId]);
 
         if (result.affectedRows == 0) {
@@ -247,16 +226,6 @@ class CheckoutModel {
         }
     }
 }
-
-// const basket = await BasketModel.getBasket(pool, 1);
-// const basketItems = basket.map(basketItem => ({
-//     productId: basketItem.id,
-//     productQuantity: basketItem.quantity,
-// }));
-// console.log(basketItems);
-// console.log(await CheckoutModel.createSession(pool, 1, basketItems));
-// console.log(await CheckoutModel.abortSession(pool, 1));
-// await CheckoutModel.setPaymentId(pool, 1, 3);
 
 export {
     CheckoutModel,

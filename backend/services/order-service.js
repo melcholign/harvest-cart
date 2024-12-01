@@ -1,12 +1,18 @@
-import { pool } from '../db/pool.js';
-import { OrderModel } from '../models/order-model.js';
-import { CheckoutModel } from '../models/checkout-model.js';
-import { OrderSimulationModel } from '../models/order-simulation-model.js';
-import { PaymentModel } from '../models/payment-model.js';
-import { CheckoutService } from './checkout-service.js';
-
+/**
+ * Service to handle order-related operations for customers, including order creation, updates, and payment processing.
+ */
 class OrderService {
 
+    /**
+     * Creates a new order for a customer, after completing the checkout process.
+     * 
+     * @param {number} customerId - The ID of the customer placing the order.
+     * @returns {Promise<number>} A promise that resolves to the newly created order ID.
+     * @throws {Error} Throws an error if the checkout is not completed.
+     * 
+     * @example
+     * const orderId = await OrderService.createOrder(customerId);
+     */
     static async createOrder(customerId) {
         const connection = await pool.getConnection();
         await connection.beginTransaction();
@@ -36,6 +42,15 @@ class OrderService {
         return orderId;
     }
 
+    /**
+     * Updates the status and estimated delivery date of a list of orders based on order simulation data.
+     * 
+     * @param {Array<Object>} orders - The list of orders to update.
+     * @returns {Promise<Array<Object>>} A promise that resolves to the updated list of orders.
+     * 
+     * @example
+     * const updatedOrders = await OrderService.updateOrders(orders);
+     */
     static async updateOrders(orders) {
         const connection = await pool.getConnection();
         await connection.beginTransaction();
