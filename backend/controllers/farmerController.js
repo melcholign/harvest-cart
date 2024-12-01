@@ -5,6 +5,11 @@ import fs from 'fs';
 
 class FarmerController{
 
+    /**
+     * Search farmers by name.
+     * @param {Object} req - The request object.
+     * @param {Object} res - The response object.
+     */
     static async searchByName(req, res){
         const searchString = req.body;
 
@@ -21,40 +26,12 @@ class FarmerController{
         }
     }
 
-    /*
-    static async getAll(req, res){
-        try{
-            farmers = FarmerModel.getAll();
 
-            if(farmers.length == 0){
-                return res.json({message: 'No farmer accounts registered'})
-            }
-            return res.json({ farmers });
-
-        } catch(err) {
-            console.log(err);
-            res.status(500).json({ message: "Server Error" });
-        }
-    }
-    
-    static async getByID(req, res){
-        const { id } = req.body;
-        
-        try{
-            matchingFarmer = FarmerModel.getByID(id);
-            
-            if(!matchingFarmer){
-                return res.json({ message: 'No farmer of given ID' });
-            }
-            return res.json({ matchingFarmer });
-
-        }catch(err){
-            console.log(err);
-            res.status(500).json({ message: "Server Error" });
-        }
-    }
-    */
-
+    /**
+     * Add new farmer after validating input.
+     * @param {Object} req - The request object.
+     * @param {Object} res - The response object.
+     */
     static async register(req, res){
         console.log(req.body);
         const {firstname, lastname, gender, dob, mobile, address, email, password} = req.body;
@@ -83,6 +60,11 @@ class FarmerController{
     };
         
 
+    /**
+     * Update farmer by ID, after validating input.
+     * @param {Object} req - The request object.
+     * @param {Object} res - The response object.
+     */
     static async update(req, res){
         console.log('Updating:');
         console.log(req.body);
@@ -121,6 +103,11 @@ class FarmerController{
         }
     };
 
+    /**
+     * Delete farmer by ID and corresponding image directories stored in server.
+     * @param {Object} req - The request object.
+     * @param {Object} res - The response object.
+     */
     static async delete(req, res){
         try{
             const farmerFolderPath = req.user.nidImgPath.replace('nid.jpg','');

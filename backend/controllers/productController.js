@@ -1,10 +1,12 @@
 import { ProductModel } from "../models/product-model.js";
-import { FarmerModel } from "../models/farmerModel.js";
-import { StoreModel } from "../models/storeModel.js";
-import { StoreController } from "./storeController.js";
 import fs from 'fs';
 
 class ProductController{
+    /**
+     * Search products by name.
+     * @param {Object} req - The request object.
+     * @param {Object} res - The response object.
+     */
     static async searchByName(req, res){
         const searchString = req.body;
 
@@ -21,38 +23,11 @@ class ProductController{
         }
     }
 
-    /*
-    static async getAll(req, res){
-        try{
-            const stores = await StoreModel.getAll();
-            if(stores.length == 0){
-                return res.json({message: 'There are no stores.'});
-            }
-            return res.json({ stores });
-
-        }catch(err){
-            console.log(err);
-            return res.json({message: 'Server Error'});
-        }
-    }
-    
-    static async getByID(req, res){
-        const { storeId } = req.body;
-        
-        try{
-            const matchingStore = await StoreModel.getByID(storeId);
-            if(!matchingStore){
-                return res.json({message: 'There are no stores with this id.'});;
-            }
-            return res.json({ matchingStore });    
-            
-        }catch(err){
-            console.log(err);
-            return res.json({message: 'Server Error'});
-        }
-    }
-    */
-
+    /**
+     * Add product, after validating inputs.
+     * @param {Object} req - The request object.
+     * @param {Object} res - The response object.
+     */
     static async add(req, res){
         const { productName, category, description, price } = req.body;
 
@@ -81,6 +56,11 @@ class ProductController{
     }
 
 
+    /**
+     * Update product by Id, after validating input.
+     * @param {Object} req - The request object.
+     * @param {Object} res - The response object.
+     */
     static async update(req, res){
         const { productName, category, description, price } = req.body;
 
@@ -106,6 +86,11 @@ class ProductController{
         }
     }
 
+    /**
+     * Delete product by ID and corresponding image directories stored in server.
+     * @param {Object} req - The request object.
+     * @param {Object} res - The response object.
+     */
     static async delete(req, res){
         try{
             const productImagePath = res.locals.product.thumbnailImgPath;

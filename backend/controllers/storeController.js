@@ -1,9 +1,12 @@
 import { StoreModel } from "../models/storeModel.js";
-import { FarmerModel } from "../models/farmerModel.js";
-import { ProductModel } from "../models/product-model.js";
 import fs from 'fs';
 
 class StoreController{
+    /**
+     * Search stores by name.
+     * @param {Object} req - The request object.
+     * @param {Object} res - The response object.
+     */
     static async searchByName(req, res){
         const searchString = req.body;
 
@@ -20,38 +23,11 @@ class StoreController{
         }
     }
 
-    /*
-    static async getAll(req, res){
-        try{
-            const stores = await StoreModel.getAll();
-            if(stores.length == 0){
-                return res.json({message: 'There are no stores.'});
-            }
-            return res.json({ stores });
-
-        }catch(err){
-            console.log(err);
-            return res.json({message: 'Server Error'});
-        }
-    }
-    
-    static async getByID(req, res){
-        const { storeId } = req.body;
-        
-        try{
-            const matchingStore = await StoreModel.getByID(storeId);
-            if(!matchingStore){
-                return res.json({message: 'There are no stores with this id.'});;
-            }
-            return res.json({ matchingStore });    
-            
-        }catch(err){
-            console.log(err);
-            return res.json({message: 'Server Error'});
-        }
-    }
-    */
-
+    /**
+     * Add a new store, after validating input.
+     * @param {Object} req - The request object.
+     * @param {Object} res - The response object.
+     */
     static async add(req, res){
         console.log(req.body);
         const { storeName, description } = req.body;
@@ -82,6 +58,11 @@ class StoreController{
         }
     }
 
+    /**
+     * Render store page.
+     * @param {Object} req - The request object.
+     * @param {Object} res - The response object.
+     */
     static async enterStore(req, res){
         try{
             res.render('store.ejs', {
@@ -94,6 +75,11 @@ class StoreController{
         }
     }
 
+    /**
+     * Update a store's information, after validating input.
+     * @param {Object} req - The request object.
+     * @param {Object} res - The response object.
+     */
     static async update(req, res){
         console.log('Updating store:');
         console.log(req.body);
@@ -124,6 +110,11 @@ class StoreController{
         }
     };
 
+    /**
+     * Delete store by ID and corresponding image directories stored in server.
+     * @param {Object} req - The request object.
+     * @param {Object} res - The response object.
+     */
     static async delete(req, res){
         try{
             const storeFolderPath = res.locals.store.coverImgPath.replace('cover.jpg','');
