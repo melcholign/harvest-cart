@@ -1,4 +1,11 @@
-<h1>Hi <%= name %></h1>
+<h1>Hi <%= farmer.firstname + ' ' + farmer.lastname %></h1>
+
+<div>
+  <h3>pfp Image:</h3>
+  <img src="/<%= farmer.pfp_img_path %>" alt="pfp_img" width="200" height="125">
+  <h3>nid Image:</h3>
+  <img src="/<%= farmer.nid_img_path %>" alt="nid_img" width="200" height="125">
+</div>
 
 <div>
   <form action="/farmer/logout" method="POST">

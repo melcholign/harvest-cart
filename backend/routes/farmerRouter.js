@@ -10,7 +10,11 @@ const storage = multer.diskStorage({
     destination: function(req, file, cb){
       let path;
       if(file.fieldname == 'nid' || file.fieldname == 'pfp'){
-        path = 'src/farmer/' + req.user.farmer_id + '/';
+        if(!req.user){
+          path = 'src/farmer/' + req.uniqueFarmerFolderName + '/';
+        } else{
+          path = req.user.nid_img_path.replace('nid.jpg','');
+        }
       } else{
         console.log('File fieldnames not matching for store image fields! NOTE: views file input tags name attribute should be gallery and cover');
       }
@@ -32,7 +36,7 @@ const storage = multer.diskStorage({
     }
 });
 const upload = multer( {storage: storage} );
-const imageUpload = upload.single('thumbnail');
+const imageUpload = upload.fields([{ name: 'nid', maxCount: 1 }, { name: 'pfp', maxCount: 1 }])
 
 
 const farmerRouter = express.Router();
@@ -41,7 +45,7 @@ const farmerRouter = express.Router();
 farmerRouter.get('/register', checkNotAuthenticated, (req, res) => {
   res.render("register.ejs");
 })
-farmerRouter.post('/register', checkNotAuthenticated, FarmerController.register);
+farmerRouter.post('/register', checkNotAuthenticated, prepImgUpload, imageUpload, FarmerController.register);
 
 farmerRouter.get('/login', checkNotAuthenticated, (req, res) => {
   res.render('login.ejs');
@@ -55,15 +59,15 @@ farmerRouter.post('/login', checkNotAuthenticated, passport.authenticate('local-
 // Protected routes
 farmerRouter.get('', checkAuthenticated, async (req, res) => {
   console.log(await FarmerModel.getStores(req.user.farmer_id));
-  res.render('index.ejs', { name: req.user.firstname + " " + req.user.lastname,
+  res.render('index.ejs', {
     stores: await FarmerModel.getStores(req.user.farmer_id),
-    farmer_id: req.user.farmer_id
+    farmer: req.user
   })
 })
 farmerRouter.get('/update', checkAuthenticated, (req, res) => {
   res.render('updateFarmer.ejs', { farmer: req.user });
 })
-farmerRouter.post('/update', checkAuthenticated, FarmerController.update);
+farmerRouter.post('/update', checkAuthenticated, imageUpload, FarmerController.update);
 farmerRouter.post('/delete', checkAuthenticated, FarmerController.delete);
 farmerRouter.post("/logout", (req, res) => {
   req.logout((err) => {
@@ -83,6 +87,10 @@ function checkNotAuthenticated(req, res, next) {
     return res.redirect('/farmer');
   }
   next();
+}
+function prepImgUpload(req, res, next){
+  req.uniqueFarmerFolderName = Date.now() + '-' + Math.round(Math.random() * 1e9);
+  return next();
 }
 
 export { farmerRouter };

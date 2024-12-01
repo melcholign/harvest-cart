@@ -1,5 +1,5 @@
 <h1>Edit</h1>
-<form action="/farmer/update" method="POST">
+<form action="/farmer/update" method="POST" enctype="multipart/form-data">
   <div>
     <label for="firstname">firstname</label>
     <input type="text" id="firstname" name="firstname" value="<%=farmer.firstname %>" required>
@@ -27,12 +27,12 @@
     <textarea id="address" name="address" required><%=farmer.address %></textarea>
   </div>
   <div>
-    <label for="nid">nid</label>
-    <input type="text" id="nid" name="nid" value="<%=farmer.nid_img_path %>" required>
+    <label for="nid_img">nid_img</label>
+    <input type="file" id="nid_img" name="nid" />
   </div>
   <div>
-    <label for="pfp">pfp</label>
-    <input type="text" id="pfp" name="pfp" value="<%=farmer.pfp_img_path %>" required>
+    <label for="pfp_img">pfp_img</label>
+    <input type="file" id="pfp_img" name="pfp" />
   </div>
   <div>
     <label for="email">email</label>

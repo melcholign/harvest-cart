@@ -56,15 +56,19 @@ class FarmerController{
 
     static async register(req, res){
         console.log(req.body);
-        const {firstname, lastname, gender, dob, mobile, address, nid, pfp, email, password} = req.body;
+        const {firstname, lastname, gender, dob, mobile, address, email, password} = req.body;
         
         // must check for empty strings because they don't count as NULL in mysql (so NOT NULL constraint does not check for them)
-        if(!(firstname && lastname && dob && mobile && address && nid && email && password)){
+        if(!(firstname && lastname && dob && mobile && address && email && password)){
             return res.json({ message: "All required input fields must be filled!" });
         }
+
+        const nid_img_path = 'src/farmer/' + req.uniqueFarmerFolderName + '/nid.jpg';
+        const pfp_img_path = 'src/farmer/' + req.uniqueFarmerFolderName + '/pfp.jpg';
+
         try {
             const hashedPassword = await bcryptjs.hash(password, 10);
-            await FarmerModel.register(firstname, lastname, gender, dob, mobile, address, nid, pfp, email, hashedPassword);
+            await FarmerModel.register(firstname, lastname, gender, dob, mobile, address, nid_img_path, pfp_img_path, email, hashedPassword);
             
             res.redirect('/farmer/login');
         }catch(err) {
@@ -82,10 +86,10 @@ class FarmerController{
         console.log('Updating:');
         console.log(req.body);
 
-        const {firstname, lastname, gender, dob, mobile, address, nid, pfp, email, password} = req.body;
+        const {firstname, lastname, gender, dob, mobile, address, email, password} = req.body;
         console.log('This farmers id:' + req.user.farmer_id);
 
-        if(!(firstname && lastname && dob && mobile && address && nid && email)){
+        if(!(firstname && lastname && dob && mobile && address && email)){
             return res.json({ message: "All required input fields must be filled!" });
         }
 

@@ -10,13 +10,13 @@ const storage = multer.diskStorage({
       let path;
       if(file.fieldname == 'cover'){
         if(!req.store){
-          path = 'src/farmer/' + req.user.farmer_id + '/store/' + req.uniqueStoreFolderName + '/';
+          path = req.user.nid_img_path.replace('nid.jpg','') + 'store/' + req.uniqueStoreFolderName + '/';
         } else{
           path = req.store.cover_img_path.replace('cover.jpg','');
         }
       } else if(file.fieldname == 'gallery'){
         if(!req.store){
-          path = 'src/farmer/' + req.user.farmer_id + '/store/' + req.uniqueStoreFolderName + '/gallery/';
+          path = req.user.nid_img_path.replace('nid.jpg','') + 'store/' + req.uniqueStoreFolderName + '/gallery/';
         }else{
           path = req.store.gallery_imgs_path;
         }

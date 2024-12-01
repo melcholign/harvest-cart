@@ -59,8 +59,8 @@ class StoreController{
             return res.json({ message: 'All required input fields must be filled!'});
         }
         
-        const cover_img_path = 'src/farmer/' + req.user.farmer_id + '/store/' + req.uniqueStoreFolderName + '/cover.jpg';
-        const gallery_imgs_path = 'src/farmer/' + req.user.farmer_id + '/store/' + req.uniqueStoreFolderName + '/gallery/';
+        const cover_img_path =  req.user.nid_img_path.replace('nid.jpg','') + 'store/' + req.uniqueStoreFolderName + '/cover.jpg';
+        const gallery_imgs_path = req.user.nid_img_path.replace('nid.jpg','') + 'store/' + req.uniqueStoreFolderName + '/gallery/';
 
 
         try{
