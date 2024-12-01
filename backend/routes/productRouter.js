@@ -11,7 +11,7 @@ const storage = multer.diskStorage({
     destination: function(req, file, cb){
       let path;
       if(file.fieldname == 'thumbnail'){
-        path =  req.store.gallery_imgs_path.replace('gallery','product');
+        path =  req.store.galleryImgsPath.replace('gallery','product');
       } else{
         console.log('File fieldnames not matching for store image fields! NOTE: views file input tags name attribute should be gallery and cover');
       }
@@ -67,7 +67,7 @@ async function checkOwnership(req, res, next){
       if(!store){
         return res.json({ message: 'No store with such ID. '});
       }
-      if(store.farmer_id != req.user.farmer_id){
+      if(store.farmerId != req.user.farmerId){
           return res.json({ message: 'Access denied!'});
       }
       req.store = store;

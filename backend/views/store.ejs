@@ -1,7 +1,7 @@
-<h1><%= store.store_name %></h1>
+<h1><%= store.storeName %></h1>
 <h2><%= store.description %></h2>
 
-<% if(store.is_open){ %>
+<% if(store.isOpen){ %>
     <h3>Status: Open</h3>
 <% } else { %>
     <h3>Status: Closed</h3>
@@ -9,10 +9,10 @@
 
 <h3>Current rating: <%= store.rating %></h3>
 <h3>Cover Image:</h3>
-<img src="/<%= store.cover_img_path %>" alt="cover_img" width="200" height="125">
+<img src="/<%= store.coverImgPath %>" alt="cover_img" width="200" height="125">
 <h3>Gallery Images:</h3>
 <% for(let i = 0; i < 8; i++){ %>
-  <img src="/<%= store.gallery_imgs_path %>/<%= i %>.jpg" width="200" height="125">
+  <img src="/<%= store.galleryImgsPath %>/<%= i %>.jpg" width="200" height="125">
 <% } %>
 
 <form action="/farmer/store/<%= store.storeId %>/update" method="GET">

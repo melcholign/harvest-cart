@@ -10,15 +10,15 @@ const storage = multer.diskStorage({
       let path;
       if(file.fieldname == 'cover'){
         if(!req.store){
-          path = req.user.nid_img_path.replace('nid.jpg','') + 'store/' + req.uniqueStoreFolderName + '/';
+          path = req.user.nidImgPath.replace('nid.jpg','') + 'store/' + req.uniqueStoreFolderName + '/';
         } else{
-          path = req.store.cover_img_path.replace('cover.jpg','');
+          path = req.store.coverImgPath.replace('cover.jpg','');
         }
       } else if(file.fieldname == 'gallery'){
         if(!req.store){
-          path = req.user.nid_img_path.replace('nid.jpg','') + 'store/' + req.uniqueStoreFolderName + '/gallery/';
+          path = req.user.nidImgPath.replace('nid.jpg','') + 'store/' + req.uniqueStoreFolderName + '/gallery/';
         }else{
-          path = req.store.gallery_imgs_path;
+          path = req.store.galleryImgsPath;
         }
         if(req.galleryImgCounter == 0 && fs.existsSync(path)){
           fs.rmSync(path, { recursive: true, force: true });
@@ -82,7 +82,7 @@ async function checkOwnership(req, res, next){
       if(!store){
         return res.json({ message: 'No store with such ID. '});
       }
-      if(store.farmer_id != req.user.farmer_id){
+      if(store.farmerId != req.user.farmerId){
           return res.json({ message: 'Access denied!'});
       }
       req.store = store;

@@ -4,7 +4,7 @@ import { pool } from '../db/pool.js';
 const schema =
     `
 CREATE TABLE IF NOT EXISTS farmer(
-    farmer_id int NOT NULL AUTO_INCREMENT,
+    farmerId int NOT NULL AUTO_INCREMENT,
 
     firstname varchar(20) NOT NULL,
     lastname varchar(20) NOT NULL,
@@ -12,34 +12,34 @@ CREATE TABLE IF NOT EXISTS farmer(
     dob DATE NOT NULL,
     mobile varchar(20) NOT NULL UNIQUE,
     address varchar(50) NOT NULL,
-    nid_img_path varchar(255) NOT NULL UNIQUE,
-    pfp_img_path varchar(255) NULL UNIQUE,
+    nidImgPath varchar(255) NOT NULL UNIQUE,
+    pfpImgPath varchar(255) NULL UNIQUE,
 
     email varchar(50) NOT NULL UNIQUE,
-    pass_hash varchar(255) NOT NULL,
+    passHash varchar(255) NOT NULL,
 
     dateCreated TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     dateUpdated TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
 
-    PRIMARY KEY(farmer_id)
+    PRIMARY KEY(farmerId)
 );
 
 CREATE TABLE IF NOT EXISTS store(
     storeId int NOT NULL AUTO_INCREMENT,
-    farmer_id int NOT NULL,
+    farmerId int NOT NULL,
 
-    store_name varchar(50) NOT NULL,
+    storeName varchar(50) NOT NULL,
     rating float,
-    is_open BOOLEAN NOT NULL,
+    isOpen BOOLEAN NOT NULL,
     description varchar(5000),
-    gallery_imgs_path varchar(255),
-    cover_img_path varchar(255),
+    galleryImgsPath varchar(255),
+    coverImgPath varchar(255),
 
     dateCreated TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     dateUpdated TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
 
     PRIMARY KEY(storeId),
-    FOREIGN KEY(farmer_id) REFERENCES farmer(farmer_id)
+    FOREIGN KEY(farmerId) REFERENCES farmer(farmerId)
 );
 `
 await pool.query(schema);
@@ -80,7 +80,7 @@ class FarmerModel {
         const query =
             `SELECT * 
          FROM farmer f
-         WHERE f.farmer_id = "${id}";`;
+         WHERE f.farmerId = "${id}";`;
 
         try {
             const [results, fields] = await pool.query(query);
@@ -114,11 +114,11 @@ class FarmerModel {
         }
     }
 
-    static async getStores(farmer_id) {
+    static async getStores(farmerId) {
         const query =
         `SELECT *
         FROM store s
-        WHERE s.farmer_id = ${farmer_id};`;
+        WHERE s.farmerId = ${farmerId};`;
 
         try {
             const [results, fields] = await pool.query(query);
@@ -131,11 +131,11 @@ class FarmerModel {
 
 
 
-    static async register(firstname, lastname, gender, dob, mobile, address, NID_img_path, pfp_img_path, email, pass_hash) {
+    static async register(firstname, lastname, gender, dob, mobile, address, NID_img_path, pfpImgPath, email, passHash) {
 
         const query =
-            `INSERT into farmer (firstname, lastname, gender, dob, mobile, address, nid_img_path, pfp_img_path, email, pass_hash)
-         VALUES ('${firstname}', '${lastname}', '${gender}', '${dob}', '${mobile}', '${address}', '${NID_img_path}', '${pfp_img_path}', '${email}', '${pass_hash}');`;
+            `INSERT into farmer (firstname, lastname, gender, dob, mobile, address, nidImgPath, pfpImgPath, email, passHash)
+         VALUES ('${firstname}', '${lastname}', '${gender}', '${dob}', '${mobile}', '${address}', '${NID_img_path}', '${pfpImgPath}', '${email}', '${passHash}');`;
 
         try {
             const [results, fields] = await pool.query(query);
@@ -146,7 +146,7 @@ class FarmerModel {
         }
     }
 
-    static async update(firstname, lastname, gender, dob, mobile, address, email, pass_hash, farmer_id) {
+    static async update(firstname, lastname, gender, dob, mobile, address, email, passHash, farmerId) {
         const query =
             `UPDATE farmer
          SET firstname = '${firstname}', 
@@ -156,8 +156,8 @@ class FarmerModel {
          mobile = '${mobile}',
          address = '${address}',
          email = '${email}',
-         pass_hash = '${pass_hash}'
-         WHERE farmer_id = ${farmer_id};`;
+         passHash = '${passHash}'
+         WHERE farmerId = ${farmerId};`;
 
         try {
             const [results, fields] = await pool.query(query);
@@ -172,7 +172,7 @@ class FarmerModel {
     static async delete(farmer_ID) {
         const query =
             `DELETE FROM farmer
-        WHERE farmer_id = '${farmer_ID}';`;
+        WHERE farmerId = '${farmer_ID}';`;
 
         try {
             const [results, fields] = await pool.query(query);

@@ -3,7 +3,7 @@ CREATE DATABASE cse327_project;
 USE cse327_project;
 
 CREATE TABLE farmer(
-    farmer_id int NOT NULL AUTO_INCREMENT,
+    farmerId int NOT NULL AUTO_INCREMENT,
 
     firstname varchar(20) NOT NULL,
     lastname varchar(20) NOT NULL,
@@ -11,34 +11,34 @@ CREATE TABLE farmer(
     dob DATE NOT NULL,
     mobile varchar(20) NOT NULL UNIQUE,
     address varchar(50) NOT NULL,
-    nid_img_path varchar(1024) NOT NULL UNIQUE,
-    pfp_img_path varchar(1024) NULL UNIQUE,
+    nidImgPath varchar(1024) NOT NULL UNIQUE,
+    pfpImgPath varchar(1024) NULL UNIQUE,
 
     email varchar(50) NOT NULL UNIQUE,
-    pass_hash varchar(1024) NOT NULL,
+    passHash varchar(1024) NOT NULL,
 
     dateCreated TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     dateUpdated TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
 
-    PRIMARY KEY(farmer_id)
+    PRIMARY KEY(farmerId)
 );
 
 CREATE table store(
     storeId int NOT NULL AUTO_INCREMENT,
-    farmer_id int NOT NULL,
+    farmerId int NOT NULL,
 
-    store_name varchar(50) NOT NULL,
+    storeName varchar(50) NOT NULL,
     rating float NULL,
-    is_open BOOLEAN NOT NULL DEFAULT 0,
+    isOpen BOOLEAN NOT NULL DEFAULT 0,
     description varchar(5000) NULL,
-    gallery_imgs_path varchar(255) UNIQUE,
-    cover_img_path varchar(255) UNIQUE,
+    galleryImgsPath varchar(255) UNIQUE,
+    coverImgPath varchar(255) UNIQUE,
 
     dateCreated TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     dateUpdated TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
 
     PRIMARY KEY(storeId),
-    FOREIGN KEY(farmer_id) REFERENCES farmer(farmer_id)
+    FOREIGN KEY(farmerId) REFERENCES farmer(farmerId)
 );
 
 
@@ -69,16 +69,16 @@ CREATE table product(
 );
 
 CREATE table customer(
-    customer_id int NOT NULL AUTO_INCREMENT,
+    customerId int NOT NULL AUTO_INCREMENT,
     customer_name varchar(100) NOT NULL,
 
-    PRIMARY KEY(customer_id)
+    PRIMARY KEY(customerId)
 );
 
 CREATE table rating(
     rating_id int NOT NULL AUTO_INCREMENT,
     productId int NOT NULL,
-    customer_id int NOT NULL,
+    customerId int NOT NULL,
 
     rating int NOT NULL,
     comment varchar(1500) NULL,
@@ -88,6 +88,6 @@ CREATE table rating(
 
     PRIMARY KEY(rating_id),
     FOREIGN KEY(productId) REFERENCES product(productId),
-    FOREIGN KEY(customer_id) REFERENCES customer(customer_id)
+    FOREIGN KEY(customerId) REFERENCES customer(customerId)
 );
 

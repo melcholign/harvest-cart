@@ -54,18 +54,18 @@ class StoreController{
 
     static async add(req, res){
         console.log(req.body);
-        const { store_name, description } = req.body;
+        const { storeName, description } = req.body;
 
-        if(!store_name){
+        if(!storeName){
             return res.json({ message: 'All required input fields must be filled!'});
         }
         
-        const cover_img_path =  req.user.nid_img_path.replace('nid.jpg','') + 'store/' + req.uniqueStoreFolderName + '/cover.jpg';
-        const gallery_imgs_path = req.user.nid_img_path.replace('nid.jpg','') + 'store/' + req.uniqueStoreFolderName + '/gallery/';
+        const coverImgPath =  req.user.nidImgPath.replace('nid.jpg','') + 'store/' + req.uniqueStoreFolderName + '/cover.jpg';
+        const galleryImgsPath = req.user.nidImgPath.replace('nid.jpg','') + 'store/' + req.uniqueStoreFolderName + '/gallery/';
 
 
         try{
-            await StoreModel.add(req.user.farmer_id, store_name, description, gallery_imgs_path, cover_img_path);
+            await StoreModel.add(req.user.farmerId, storeName, description, galleryImgsPath, coverImgPath);
             return res.redirect('/farmer');
         }catch(err) {
             if(err.code == 'ER_DUP_ENTRY'){
@@ -99,14 +99,14 @@ class StoreController{
         console.log(req.body);
         console.log('This stores id:' + req.params.storeId);
 
-        const {store_name, description} = req.body;
+        const {storeName, description} = req.body;
 
-        if(!(store_name)){
+        if(!(storeName)){
             return res.json({ message: "All required input fields must be filled!" });
         }
 
         try {
-            await StoreModel.update(req.params.storeId, store_name, description);
+            await StoreModel.update(req.params.storeId, storeName, description);
             res.redirect('/farmer/store/' + req.params.storeId);
         }catch(err) {
             if(err.code == 'ER_DUP_ENTRY'){
@@ -126,7 +126,7 @@ class StoreController{
 
     static async delete(req, res){
         try{
-            const storeFolderPath = res.locals.store.cover_img_path.replace('cover.jpg','');
+            const storeFolderPath = res.locals.store.coverImgPath.replace('cover.jpg','');
             fs.rmSync(storeFolderPath, { recursive: true, force: true });
             await StoreModel.delete(req.params.storeId);
             res.redirect('/farmer');

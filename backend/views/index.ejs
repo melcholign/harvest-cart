@@ -2,9 +2,9 @@
 
 <div>
   <h3>pfp Image:</h3>
-  <img src="/<%= farmer.pfp_img_path %>" alt="pfp_img" width="200" height="125">
+  <img src="/<%= farmer.pfpImgPath %>" alt="pfp_img" width="200" height="125">
   <h3>nid Image:</h3>
-  <img src="/<%= farmer.nid_img_path %>" alt="nid_img" width="200" height="125">
+  <img src="/<%= farmer.nidImgPath %>" alt="nid_img" width="200" height="125">
 </div>
 
 <div>
@@ -27,9 +27,9 @@
 
 <% for(let i = 0; i < stores.length; i++){ %>
   <div>
-    <h3><%= i %>. Name:<%= stores[i].store_name %>  Rating:<%= stores[i].rating %> Open:<%= stores[i].is_open %></h3>
+    <h3><%= i %>. Name:<%= stores[i].storeName %>  Rating:<%= stores[i].rating %> Open:<%= stores[i].isOpen %></h3>
     <form action="/farmer/store/<%= stores[i].storeId %>" method="GET">
-      <img src="<%= stores[i].cover_img_path %>" alt="cover image" width="200" height="125">
+      <img src="<%= stores[i].coverImgPath %>" alt="cover image" width="200" height="125">
       <button type="submit">Check</button>
     </form>
     <hr>

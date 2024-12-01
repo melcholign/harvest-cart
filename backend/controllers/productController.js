@@ -60,7 +60,7 @@ class ProductController{
             return res.json({ message: 'All required input fields must be filled!'});
         }
 
-        const thumbnailImgPath = req.store.gallery_imgs_path.replace('gallery','product') + req.uniqueProductName + '.jpg';
+        const thumbnailImgPath = req.store.galleryImgsPath.replace('gallery','product') + req.uniqueProductName + '.jpg';
 
         try{
             await ProductModel.add(req.params.storeId, category, productName, description, price, thumbnailImgPath);

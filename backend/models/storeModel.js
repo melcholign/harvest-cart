@@ -4,21 +4,21 @@ const schema =
 `
 CREATE TABLE IF NOT EXISTS store(
     storeId int NOT NULL AUTO_INCREMENT,
-    farmer_id int NOT NULL,
+    farmerId int NOT NULL,
 
-    store_name varchar(50) NOT NULL,
+    storeName varchar(50) NOT NULL,
     rating float,
-    is_open BOOLEAN NOT NULL,
+    isOpen BOOLEAN NOT NULL,
     description varchar(5000),
-    gallery_imgs_path varchar(255),
-    cover_img_path varchar(255),
+    galleryImgsPath varchar(255),
+    coverImgPath varchar(255),
 
     dateCreated TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     dateUpdated TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
 
     PRIMARY KEY(storeId),
-    FOREIGN KEY(farmer_id) REFERENCES farmer(farmer_id) ON DELETE CASCADE,
-    UNIQUE KEY store_AK (store_name,farmer_id)
+    FOREIGN KEY(farmerId) REFERENCES farmer(farmerId) ON DELETE CASCADE,
+    UNIQUE KEY store_AK (storeName,farmerId)
 );
 `
 await pool.query(schema);
@@ -41,12 +41,12 @@ class StoreModel {
         const query =
             `SELECT *
         FROM store s
-        WHERE s.store_name LIKE '%${search_string}%'
+        WHERE s.storeName LIKE '%${search_string}%'
         ORDER BY
           CASE
-            WHEN s.store_name LIKE '${search_string}' THEN 0
-            WHEN s.store_name LIKE '${search_string}%' THEN 1
-            WHEN s.store_name LIKE '%${search_string}' THEN 2
+            WHEN s.storeName LIKE '${search_string}' THEN 0
+            WHEN s.storeName LIKE '${search_string}%' THEN 1
+            WHEN s.storeName LIKE '%${search_string}' THEN 2
             ELSE 3
           END`;
 
@@ -113,10 +113,10 @@ class StoreModel {
         }
     }
 
-    static async add(farmer_id, store_name, description, gallery_imgs_path, cover_img_path) {
+    static async add(farmerId, storeName, description, galleryImgsPath, coverImgPath) {
         const query =
-            `INSERT INTO store (farmer_id, store_name, description, gallery_imgs_path, cover_img_path)
-        VALUES ('${farmer_id}', '${store_name}', '${description}', '${gallery_imgs_path}', '${cover_img_path}');`;
+            `INSERT INTO store (farmerId, storeName, description, galleryImgsPath, coverImgPath)
+        VALUES ('${farmerId}', '${storeName}', '${description}', '${galleryImgsPath}', '${coverImgPath}');`;
 
         try {
             const [results, fields] = await pool.query(query);
@@ -128,10 +128,10 @@ class StoreModel {
     }
 
 
-    static async update(storeId, store_name, description) {
+    static async update(storeId, storeName, description) {
         const query =
             `UPDATE store
-         SET store_name = '${store_name}',
+         SET storeName = '${storeName}',
              description = '${description}'
          WHERE storeId = ${storeId};`;
 

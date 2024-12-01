@@ -13,7 +13,7 @@ const storage = multer.diskStorage({
         if(!req.user){
           path = 'src/farmer/' + req.uniqueFarmerFolderName + '/';
         } else{
-          path = req.user.nid_img_path.replace('nid.jpg','');
+          path = req.user.nidImgPath.replace('nid.jpg','');
         }
       } else{
         console.log('File fieldnames not matching for store image fields! NOTE: views file input tags name attribute should be gallery and cover');
@@ -58,9 +58,9 @@ farmerRouter.post('/login', checkNotAuthenticated, passport.authenticate('local-
 
 // Protected routes
 farmerRouter.get('', checkAuthenticated, async (req, res) => {
-  console.log(await FarmerModel.getStores(req.user.farmer_id));
+  console.log(await FarmerModel.getStores(req.user.farmerId));
   res.render('index.ejs', {
-    stores: await FarmerModel.getStores(req.user.farmer_id),
+    stores: await FarmerModel.getStores(req.user.farmerId),
     farmer: req.user
   })
 })
