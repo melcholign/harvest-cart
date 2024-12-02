@@ -53,16 +53,16 @@ class StoreModel {
      * @returns {Promise<Array>} List of matching stores.
      * @throws {Error} If query fails.
      */
-    static async searchByName(search_string) {
+    static async searchByName(searchString) {
         const query =
             `SELECT *
         FROM store s
-        WHERE s.storeName LIKE '%${search_string}%'
+        WHERE s.storeName LIKE '%${searchString}%'
         ORDER BY
           CASE
-            WHEN s.storeName LIKE '${search_string}' THEN 0
-            WHEN s.storeName LIKE '${search_string}%' THEN 1
-            WHEN s.storeName LIKE '%${search_string}' THEN 2
+            WHEN s.storeName LIKE '${searchString}' THEN 0
+            WHEN s.storeName LIKE '${searchString}%' THEN 1
+            WHEN s.storeName LIKE '%${searchString}' THEN 2
             ELSE 3
           END`;
 

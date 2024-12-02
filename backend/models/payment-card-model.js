@@ -13,7 +13,7 @@ CREATE TABLE IF NOT EXISTS PaymentCard (
     cvv INT NOT NULL,
     expiryDate DATE NOT NULL,
     brand ENUM('visa', 'mastercard', 'american express') NOT NULL,
-    balance NUMERIC(15, 2) NOT NULL CHECK(balance >= 0) DEFAULT 0,
+    balance NUMERIC(15, 2) NOT NULL DEFAULT 0,
 
     PRIMARY KEY(cardId),
     UNIQUE(cardNumber, cardType, brand)
