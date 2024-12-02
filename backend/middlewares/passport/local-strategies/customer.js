@@ -1,3 +1,7 @@
+import { Strategy as LocalStrategy } from 'passport-local';
+import bcrypt from 'bcrypt';
+import { CustomerModel } from '../../../models/customer-model.js';
+
 /**
  * Authenticates a customer using their email and password.
  * 

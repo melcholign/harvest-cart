@@ -79,49 +79,67 @@ class ProductController {
     }
 
     /**
-     * Searches, filters, and sorts products based on query parameters.
-     * Applies pagination to the results.
-     * 
-     * @param {Object} req - The HTTP request object.
-     * @param {Object} req.query - Query parameters.
-     * @param {string} [req.query.name] - Search term for product names.
-     * @param {string} [req.query.categories] - Comma-separated list of categories to filter.
-     * @param {number} [req.query.minPrice] - Minimum price filter.
-     * @param {number} [req.query.maxPrice] - Maximum price filter.
-     * @param {number} [req.query.minRating] - Minimum rating filter.
-     * @param {number} [req.query.maxRating] - Maximum rating filter.
-     * @param {string} [req.query.sortBy] - Field to sort by ("price", "rating", "dateCreated").
-     * @param {string} [req.query.order] - Sort order ("ASC" or "DESC").
-     * @param {number} [req.query.page=1] - Page number for pagination.
-     * @param {number} [req.query.limit=10] - Number of results per page.
-     * @param {Object} res - The HTTP response object.
-     */
+ * Searches, filters, and sorts products based on query parameters.
+ * Applies pagination to the results.
+ * 
+ * @param {Object} req - The HTTP request object.
+ * @param {Object} req.query - Query parameters.
+ * @param {string} [req.query.name] - Search term for product names.
+ * @param {string} [req.query.category] - Category to filter.
+ * @param {number} [req.query.minPrice] - Minimum price filter.
+ * @param {number} [req.query.maxPrice] - Maximum price filter.
+ * @param {number} [req.query.minRating] - Minimum rating filter.
+ * @param {number} [req.query.maxRating] - Maximum rating filter.
+ * @param {string} [req.query.sortBy] - Field to sort by ("price", "rating", "dateCreated").
+ * @param {string} [req.query.order] - Sort order ("ASC" or "DESC").
+ * @param {number} [req.query.page=1] - Page number for pagination.
+ * @param {number} [req.query.limit=10] - Number of results per page.
+ * @param {Object} res - The HTTP response object.
+ */
     static async searchProducts(req, res) {
         try {
             const searchQuery = req.query.name || ""; // Search term
             const page = parseInt(req.query.page) || 1; // Current page (default: 1)
             const limit = parseInt(req.query.limit) || 10; // Results per page (default: 10)
             const offset = (page - 1) * limit; // Calculate offset for pagination
-            const { categories, minPrice, maxPrice, minRating, maxRating, sortBy, order } = req.query;
-    
+            const { category, minPrice, maxPrice, minRating, maxRating, sortBy, order } = req.query;
+
+            // Search products by name
+            let results = await ProductModel.searchByName(searchQuery);
+
             // Filter products based on categories, price range, and rating range
-            const filteredProducts = await ProductModel.filterProducts({
-                categories: categories ? categories.split(",") : null,
-                priceRange: { min: minPrice || 0, max: maxPrice || Number.MAX_VALUE },
-                ratingRange: { min: minRating || 0, max: maxRating || 5 },
-            });
-    
-            // Sort the filtered products
-            const sortedProducts = await ProductModel.sortProducts(sortBy || "dateCreated", order || "ASC");
-    
-            // Search and filter within the sorted results
-            const results = sortedProducts.filter(product =>
-                product.productName.toLowerCase().includes(searchQuery.toLowerCase())
-            );
-    
+            if (category) {
+                results = results.filter(product => product.category == category);
+            }
+
+            if (minPrice || maxPrice) {
+                results = results.filter(product => {
+                    return product.price >= (minPrice || 0) && product.price <= (maxPrice || Number.MAX_VALUE);
+                });
+            }
+
+            if (minRating || maxRating) {
+                results = results.filter(product => {
+                    return product.rating >= (minRating || 0) && product.rating <= (maxRating || 5);
+                });
+            }
+
+            // Sort the results
+            if (sortBy) {
+                results.sort((a, b) => {
+                    if (sortBy === 'price') return a.price - b.price;
+                    if (sortBy === 'rating') return a.rating - b.rating;
+                    return new Date(a.dateCreated) - new Date(b.dateCreated);
+                });
+            }
+
+            if (order && order.toUpperCase() === 'DESC') {
+                results.reverse();
+            }
+
             // Apply pagination
             const paginatedResults = results.slice(offset, offset + limit);
-    
+
             res.status(200).json({
                 page,
                 limit,
@@ -134,6 +152,7 @@ class ProductController {
             res.status(500).json({ message: "Internal Server Error" });
         }
     }
+
 
     /**
      * Checks if a customer is eligible to rate a product.

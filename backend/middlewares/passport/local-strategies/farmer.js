@@ -1,3 +1,6 @@
+import bcryptjs from 'bcryptjs';
+import { FarmerModel } from '../../../models/farmerModel.js';
+import { Strategy as LocalStrategy } from 'passport-local';
 /**
  * Authenticates a farmer using their email and password.
  * 

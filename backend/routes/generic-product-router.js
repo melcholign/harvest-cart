@@ -8,5 +8,5 @@ router.get('/', ProductController.searchProducts);
 router.post('/:productId/ratings', isAuthenticated, ProductController.rateProduct);
 
 export {
-    router as productRouter,
+    router as genericProductRouter,
 }

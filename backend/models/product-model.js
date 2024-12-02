@@ -127,7 +127,7 @@ class ProductModel {
     static async searchByName(searchString) {
         const query =
             `SELECT *
-        FROM product p
+        FROM Product p
         WHERE p.productName LIKE '%${searchString}%'
         ORDER BY
           CASE
@@ -166,7 +166,7 @@ class ProductModel {
 
         const query =
             `SELECT *
-        FROM product p
+        FROM Product p
         WHERE ${conditionString}
         ORDER BY p.rating DESC;`
 
@@ -189,7 +189,7 @@ class ProductModel {
     static async getByID(productId) {
         const query =
             `SELECT *
-        FROM product
+        FROM Product
         WHERE productId = ${productId};`;
 
         try {
@@ -323,7 +323,7 @@ class ProductModel {
      */
     static async delete(productId){
         const query =
-        `DELETE FROM product
+        `DELETE FROM Product
          WHERE productId = ${productId};`
 
         try {
@@ -380,7 +380,7 @@ class ProductModel {
         }
 
         const updateAvgQuery = 'UPDATE Product SET rating ='
-            + '(SELECT AVG(rating) AS rating FROM Rating WHERE productId = ?)';
+            + '(SELECT AVG(rating) FROM Rating WHERE productId = ?)';
         await connection.query(updateAvgQuery, [productId]);
     }
 }
