@@ -5,17 +5,17 @@ import { testBasketUpdaters } from './test-basket-updaters.js';
 import { testBasketClearers } from './test-basket-clearers.js';
 import { testBasketCheckout } from './test-basket-checkout.js';
 
-// describe('Getting items from basket', () => {
+describe('Getting items from basket', () => {
 
-//     test(
-//         'Retrieving basket, with no changes necessary',
-//         testBasketGetters.getBasketWithNoChanges
-//     );
-//     test(
-//         'Retrieving basket, with changes to it due to inconsistency with stock',
-//         testBasketGetters.getBasketWithChanges
-//     );
-// });
+    test(
+        'Retrieving basket, with no changes necessary',
+        testBasketGetters.getBasketWithNoChanges
+    );
+    test(
+        'Retrieving basket, with changes to it due to inconsistency with stock',
+        testBasketGetters.getBasketWithChanges
+    );
+});
 
 describe('Adding a product to basket', () => {
     test(

@@ -47,7 +47,7 @@ CREATE TABLE IF NOT EXISTS Rating (
     rating INT DEFAULT 0 NOT NULL,
 
     PRIMARY KEY(productId, customerId),
-    FOREIGN KEY(productId) REFERENCES Product(productId),
+    FOREIGN KEY(productId) REFERENCES Product(productId) ON DELETE CASCADE,
     FOREIGN KEY(customerId) REFERENCES Customer(customerId)
 )
 `
