@@ -121,16 +121,16 @@ class FarmerModel {
      * @returns {Promise<Array>} List of matching farmers.
      * @throws {Error} If query fails.
      */
-    static async searchByName(search_string) {
+    static async searchByName(searchString) {
         const query =
             `SELECT *
         FROM farmer f
-        WHERE (f.firstname, ' ', f.lastname) LIKE '%${search_string}%'
+        WHERE (f.firstname, ' ', f.lastname) LIKE '%${searchString}%'
         ORDER BY
           CASE
-            WHEN (f.firstname, ' ', f.lastname) LIKE '${search_string}' THEN 0
-            WHEN (f.firstname, ' ', f.lastname) LIKE '${search_string}%' THEN 1
-            WHEN (f.firstname, ' ', f.lastname) LIKE '%${search_string}' THEN 2
+            WHEN (f.firstname, ' ', f.lastname) LIKE '${searchString}' THEN 0
+            WHEN (f.firstname, ' ', f.lastname) LIKE '${searchString}%' THEN 1
+            WHEN (f.firstname, ' ', f.lastname) LIKE '%${searchString}' THEN 2
             ELSE 3
           END`;
 
