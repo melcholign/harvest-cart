@@ -12,7 +12,8 @@ router.get('/account/verification', isAuthenticated, VerificationController.init
 router.post('/account/verification', isAuthenticated, VerificationController.completeAccountVerification);
 
 router.post('/account/login',
-    passport.authenticate('local-customer', { successRedirect: '/', failureRedirect: '/' }),
+    (req, res, next) => { console.log('reached'); next()},
+    passport.authenticate('local-customer', { successRedirect: '/success', failureRedirect: '/failure' }),
 );
 router.post('/account/logout', (res, req) => {
     req.logout((err) => {

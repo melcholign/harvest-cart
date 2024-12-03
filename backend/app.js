@@ -46,6 +46,20 @@ app.get('/', (req, res) => {
     });
 });
 
+app.get('/success', (req, res) => {
+    console.log('success')
+    res.json({
+        status: 'success',
+    });
+});
+
+app.get('/failure', (req, res) => {
+    console.log('failure');
+    res.json({
+        status: 'failure',
+    });
+});
+
 const PORT = process.env.PORT || 3000;
 
 app.listen(PORT, () => {
