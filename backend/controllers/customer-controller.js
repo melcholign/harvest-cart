@@ -20,8 +20,21 @@ class CustomerController {
 
         // Check for validation errors
         if (!result.isEmpty()) {
-            const formattedResult = formatValidationResult(result);
-            res.status(400).json(formattedResult);
+            const { errors: resultErrors } = result;
+
+            const errors = {};
+            const formData = {};
+
+            resultErrors.forEach(error => {
+                errors[error.path] = error.msg;
+                formData[error.path] = error.value;
+            });
+
+            console.log(resultErrors);
+            console.log(errors);
+            console.log(formData);
+
+            res.render('customer/registration.ejs', { formData, errors, globalError: '' })
             return;
         }
 

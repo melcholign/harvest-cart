@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Customer Registration</title>
+  <link rel="stylesheet" href="/styles.css">
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+      background-color: #f4f4f9;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+    }
+
+    .form-container {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      width: 100%;
+    }
+
+    .form-card {
+      background: #fff;
+      border-radius: 8px;
+      box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+      padding: 2rem;
+      width: 100%;
+      max-width: 400px;
+      text-align: center;
+    }
+
+    .form-title {
+      font-size: 1.8rem;
+      font-weight: bold;
+      color: #333;
+    }
+
+    .form-subtitle {
+      font-size: 1rem;
+      color: #666;
+      margin-bottom: 1rem;
+    }
+
+    .form-group {
+      margin-bottom: 1.5rem;
+      text-align: left;
+    }
+
+    .form-group label {
+      font-weight: 600;
+      display: block;
+      margin-bottom: 0.5rem;
+      color: #333;
+    }
+
+    .form-group input {
+      width: 100%;
+      padding: 0.75rem;
+      font-size: 1rem;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      box-sizing: border-box;
+    }
+
+    .error-text {
+      color: #d32f2f;
+      font-size: 0.875rem;
+      margin-top: 0.25rem;
+    }
+
+    .form-button {
+      background-color: #007bff;
+      color: white;
+      font-size: 1rem;
+      padding: 0.75rem;
+      width: 100%;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+
+    .form-button:hover {
+      background-color: #0056b3;
+    }
+
+    .error-message {
+      color: #d32f2f;
+      margin-bottom: 1rem;
+    }
+
+    .form-footer {
+      margin-top: 1rem;
+      font-size: 0.875rem;
+      color: #666;
+    }
+
+    .form-footer a {
+      color: #007bff;
+      text-decoration: none;
+    }
+
+    .form-footer a:hover {
+      text-decoration: underline;
+    }
+
+    input.error-border {
+      border-color: #d32f2f;
+    }
+
+    .error-text {
+      color: #d32f2f;
+      font-size: 0.875rem;
+      margin-top: 0.25rem;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="form-container">
+    <div class="form-card">
+      <h1 class="form-title">Create an Account</h1>
+      <p class="form-subtitle">Join us today!</p>
+      <% if (globalError) { %>
+      <p class="error-message"><%= globalError %></p>
+      <% } %>
+      <form id="registrationForm" action="/customer/account/registration" method="POST" novalidate>
+        <div class="form-group">
+          <label for="fullName">Full Name</label>
+          <input type="text" id="fullName" name="fullName" placeholder="Enter your full name" value="<%= formData?.fullName || '' %>" class="<%= errors?.fullName ? 'error-border' : '' %>" />
+          <% if (errors?.fullName) { %>
+          <p class="error-text"><%= errors.fullName %></p>
+          <% } %>
+        </div>
+        <div class="form-group">
+          <label for="email">Email</label>
+          <input type="email" id="email" name="email" placeholder="Enter your email" value="<%= formData?.email || '' %>" class="<%= errors?.email ? 'error-border' : '' %>" />
+          <% if (errors?.email) { %>
+          <p class="error-text"><%= errors.email %></p>
+          <% } %>
+        </div>
+        <div class="form-group">
+          <label for="phoneNumber">Phone Number (Optional)</label>
+          <input type="tel" id="phoneNumber" name="phoneNumber" placeholder="Enter your phone number" value="<%= formData?.phoneNumber || '' %>" />
+        </div>
+        <div class="form-group">
+          <label for="password">Password</label>
+          <input type="password" id="password" name="password" placeholder="Create a password" class="<%= errors?.password ? 'error-border' : '' %>" />
+          <% if (errors?.password) { %>
+          <p class="error-text"><%= errors.password %></p>
+          <% } %>
+        </div>
+        <div class="form-group">
+          <label for="passwordConfirmation">Confirm Password</label>
+          <input type="password" id="passwordConfirmation" name="passwordConfirmation" placeholder="Confirm your password" class="<%= errors?.passwordConfirmation ? 'error-border' : '' %>" />
+          <% if (errors?.passwordConfirmation) { %>
+          <p class="error-text"><%= errors.passwordConfirmation %></p>
+          <% } %>
+        </div>
+        <button type="submit" class="form-button">Register</button>
+      </form>
+      <p class="form-footer">Already have an account? <a href="/login">Log in</a></p>
+    </div>
+  </div>
+  <script>
+    const form = document.getElementById('registrationForm');
+    const fields = {
+      fullName: {
+        element: document.getElementById('fullName'),
+        errorElement: document.getElementById('error-fullName'),
+        validate: (value) => value.trim() !== '',
+        errorMessage: 'Full name is required.',
+      },
+      email: {
+        element: document.getElementById('email'),
+        errorElement: document.getElementById('error-email'),
+        validate: (value) => /\S+@\S+\.\S+/.test(value),
+        errorMessage: 'Please enter a valid email address.',
+      },
+      password: {
+        element: document.getElementById('password'),
+        errorElement: document.getElementById('error-password'),
+        validate: (value) =>
+          /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{8,}$/.test(value),
+        errorMessage: 'Password must be at least 8 characters, include an uppercase letter, a lowercase letter, and a digit.',
+      },
+      passwordConfirmation: {
+        element: document.getElementById('passwordConfirmation'),
+        errorElement: document.getElementById('error-passwordConfirmation'),
+        validate: (value) =>
+          value === document.getElementById('password').value,
+        errorMessage: 'Passwords do not match.',
+      },
+    };
+
+    form.addEventListener('submit', (e) => {
+      e.preventDefault(); // Prevent the form from submitting by default
+      let isValid = true;
+
+      // Validate all fields
+      Object.values(fields).forEach(({
+        element,
+        errorElement,
+        validate,
+        errorMessage
+      }) => {
+        const value = element.value.trim();
+        if (!validate(value)) {
+          isValid = false;
+          element.classList.add('error-border');
+          errorElement.textContent = errorMessage;
+        } else {
+          element.classList.remove('error-border');
+          errorElement.textContent = '';
+        }
+      });
+
+      // If all fields are valid, programmatically submit the form
+      if (isValid) {
+        form.submit(); // This submits the form if validation passes
+      }
+    });
+
+    // Clear errors on input
+    Object.values(fields).forEach(({
+      element,
+      errorElement
+    }) => {
+      element.addEventListener('input', () => {
+        element.classList.remove('error-border');
+        errorElement.textContent = '';
+      });
+    });
+  </script>
+
+</body>
+
+</html>

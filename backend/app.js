@@ -54,10 +54,7 @@ app.get('/success', (req, res) => {
 });
 
 app.get('/failure', (req, res) => {
-    console.log('failure');
-    res.json({
-        status: 'failure',
-    });
+    res.render('customer/login.ejs', {errorMessage: 'Email or password is incorrect', email: ''});
 });
 
 const PORT = process.env.PORT || 3000;
