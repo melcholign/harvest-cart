@@ -1,252 +1,257 @@
-import { FarmerController } from '../controllers/farmer-controller.js';
-import { FarmerModel } from '../models/farmerModel';
-import bcryptjs from 'bcryptjs';
-import fs from 'fs';
 import { jest } from '@jest/globals';
 import { pool } from '../../db/pool.js';
+import { FarmerController } from '../../controllers/farmer-controller.js';
+import { executeQueries } from './test-functions.js';
+import fs, { existsSync } from 'fs';
 
-jest.mock('../models/farmerModel');
-jest.mock('bcryptjs');
-jest.mock('fs');
 
-let req, res, next;
+test('Registering new farmer account into the database after performing input validation', async () => {
+  const connection = await pool.getConnection();
 
-beforeEach(() => {
-  req = {
-    body: {},
-    params: {},
-    user: {
-      nidImgPath: 'user/nid.jpg',
-      farmerId: 'farmer1'
+
+  // Retrieve AUTO_INCREMENT value for farmer table
+  let results = await connection.query(
+    `SELECT AUTO_INCREMENT
+     FROM  INFORMATION_SCHEMA.TABLES
+     WHERE TABLE_SCHEMA = 'cse327_project'
+     AND   TABLE_NAME   = 'farmer';`);
+
+  console.log(results);
+  const nextFarmerId = results[0].AUTO_INCREMENT;
+  
+  // mock request and response
+  const req = {
+    body: { 
+      firstname : 'Test',
+      lastname: 'Farmer',
+      gender: 'other',
+      dob: '2000-01-01',
+      mobile: '01211111111',
+      address: 'Sec#1, Rd#1, Hs#1',
+      email: 'test.farmer@test.com',
+      password: 'safee123'
     },
-    uniqueFarmerFolderName: 'uniqueFarmerFolder'
+    uniqueFarmerFolderName : 'test-farmer'
   };
-  res = {
-    json: jest.fn().mockReturnValue(res),
-    render: jest.fn().mockReturnValue(res),
-    redirect: jest.fn().mockReturnValue(res),
-    status: jest.fn().mockReturnValue(res),
-    locals: {}
+
+  const res = {
+    redirect: jest.fn().mockReturnThis()
   };
-  next = jest.fn();
-});
 
-describe('FarmerController', () => {
-  afterEach(() => {
-    jest.clearAllMocks();
-  });
+  //Test the controller
+  await FarmerController.register(req, res);
 
-  describe('searchByName', () => {
-    it('should return search results when found', async () => {
-      req.body = 'some farmer name';
-      FarmerModel.searchByName.mockResolvedValue([{ id: 1, name: 'Farmer 1' }]);
+  //retrieve the farmer that was just registered to verify the information is all correct
+  results = await connection.query(
+    `SELECT *
+     FROM  farmer
+     WHERE farmerId = ${nextFarmerId};`);
 
-      await FarmerController.searchByName(req, res);
+  farmer = results[0];
 
-      expect(FarmerModel.searchByName).toHaveBeenCalledWith('some farmer name');
-      expect(res.json).toHaveBeenCalledWith({ searchResultList: [{ id: 1, name: 'Farmer 1' }] });
-    });
+  //Verify the response
+  expect(res.redirect).toHaveBeenCalledWith('/farmer/login');
 
-    it('should return message when no farmers found', async () => {
-      req.body = 'some farmer name';
-      FarmerModel.searchByName.mockResolvedValue([]);
+  //Verify the farmer's information exists in database
+  expect(farmer).toBe({
+    farmerId: nextFarmerId,
+    firstname : 'Test',
+    lastname: 'Farmer',
+    gender: 'other',
+    dob: new Date('2000-01-01').toISOString(),
+    mobile: '01211111111',
+    address: 'Sec#1, Rd#1, Hs#1',
+    nidImgPath: 'src/farmer/' + req.uniqueFarmerFolderName + 'nid.jpg',
+    pfpImgPath: 'src/farmer/' + req.uniqueFarmerFolderName + 'pfp.jpg',
+    email: 'test.farmer@test.com',
+    passHash: '$2a$10$5goTEE9qnD/7ewbL4C3TquApUmlFL0Jdwrh.sgIeYZVvnwJh8YWTe',
+    dateCreated: farmer.dateCreated,
+    dateUpdated: farmer.dateUpdated
+})
 
-      await FarmerController.searchByName(req, res);
+  // ensure a directory have been created to store the new farmer's images
+  expect(fs.existsSync(farmer.nidImgPath.replace('nid.jpg',''))).tobe(true);
 
-      expect(FarmerModel.searchByName).toHaveBeenCalledWith('some farmer name');
-      expect(res.json).toHaveBeenCalledWith({ message: 'No farmers match your searched name.' });
-    });
+  // remove mock data
+  await connection.query(
+    `
+    DELETE FROM farmer
+    WHERE farmerId = '${farmer.farmerId}';
+    `
+  )
 
-    it('should handle server error', async () => {
-      req.body = 'some farmer name';
-      FarmerModel.searchByName.mockRejectedValue(new Error('Server error'));
+  await connection.release();
+})
 
-      await FarmerController.searchByName(req, res);
 
-      expect(FarmerModel.searchByName).toHaveBeenCalledWith('some farmer name');
-      expect(res.json).toHaveBeenCalledWith({ message: 'Server error' });
-    });
-  });
 
-  describe('register', () => {
-    it('should register a new farmer successfully', async () => {
-      req.body = {
-        firstname: 'New',
-        lastname: 'Farmer',
-        gender: 'male',
-        dob: '1990-01-01',
-        mobile: '0123456789',
-        address: '123 Farm Lane',
-        email: 'newfarmer@example.com',
-        password: 'password'
-      };
-      const hashedPassword = 'hashedPassword';
-      bcryptjs.hash.mockResolvedValue(hashedPassword);
-      FarmerModel.register.mockResolvedValue();
+test('Updating a farmer information already stored within the database', async () => {
+  const connection = await pool.getConnection();
 
-      await FarmerController.register(req, res);
+  let results = await connection.query(
+    `
+    INSERT INTO TABLE farmer
+    VALUES 
+    (
+      '10000',
+      'Test',
+      'Farmer',
+      'male',
+      '2000-01-01',
+      '01211111111',
+      'Sec#1, Rd#1, Hs#1',
+      'src/farmer/test-farmer/nid.jpg',
+      'src/farmer/test-farmer/pfp.jpg',
+      'test.farmer@test.com',
+      '$2a$10$5goTEE9qnD/7ewbL4C3TquApUmlFL0Jdwrh.sgIeYZV',
+      '2024-12-02',
+      '2024-12-02'
+    );
+    `
+  );
 
-      expect(bcryptjs.hash).toHaveBeenCalledWith('password', 10);
-      expect(FarmerModel.register).toHaveBeenCalledWith('New', 'Farmer', 'male', '1990-01-01', '0123456789', '123 Farm Lane', expect.any(String), expect.any(String), 'newfarmer@example.com', hashedPassword);
-      expect(res.redirect).toHaveBeenCalledWith('/farmer/login');
-    });
+  // mock request and response
+  const req = {
+    body: { 
+      firstname : 'edited',
+      lastname: 'edited',
+      gender: 'other',
+      dob: '2999-12-31',
+      mobile: 'edited',
+      address: 'edited',
+      email: 'edited@edited.com',
+      password: 'safee123'
+    },
+    user: {
+      farmerId: 10000
+    }
+  };
 
-    it('should return message when required fields are missing', async () => {
-      req.body = {
-        lastname: 'Farmer',
-        gender: 'male',
-        dob: '1990-01-01',
-        mobile: '0123456789',
-        address: '123 Farm Lane',
-        email: 'newfarmer@example.com',
-        password: 'password'
-      };
+  const res = {
+    redirect: jest.fn().mockReturnThis()
+  };
 
-      await FarmerController.register(req, res);
+  //Test the controller
+  await FarmerController.update(req, res);
 
-      expect(res.json).toHaveBeenCalledWith({ message: 'All required input fields must be filled!' });
-    });
+  //retrieve the farmer that was just registered to verify the information is all correct
+  results = await connection.query(
+    `SELECT *
+     FROM  farmer
+     WHERE farmerId = ${req.user.farmerId};`);
 
-    it('should handle duplicate entry error', async () => {
-      req.body = {
-        firstname: 'New',
-        lastname: 'Farmer',
-        gender: 'male',
-        dob: '1990-01-01',
-        mobile: '0123456789',
-        address: '123 Farm Lane',
-        email: 'newfarmer@example.com',
-        password: 'password'
-      };
-      FarmerModel.register.mockRejectedValue({ code: 'ER_DUP_ENTRY', sqlMessage: "Duplicate entry 'newfarmer@example.com' for key 'email'" });
+  farmer = results[0];
 
-      await FarmerController.register(req, res);
+  //Verify the response
+  expect(res.redirect).toHaveBeenCalledWith('/farmer');
 
-      expect(res.json).toHaveBeenCalledWith({ message: 'The email enterred is in use by another account!' });
-    });
+  //Verify the farmer's information exists in database
+  expect(farmer).toBe({
+    farmerId: req.user.farmerId,
+    firstname : 'edited',
+    lastname: 'edited',
+    gender: 'other',
+    dob: new Date('2999-12-31').toISOString(),
+    mobile: 'edited',
+    address: 'edited',
+    nidImgPath: farmer.nidImgPath,
+    pfpImgPath: farmer.pfpImgPath,
+    email: 'edited@edited.com',
+    passHash: '$2a$10$5goTEE9qnD/7ewbL4C3TquApUmlFL0Jdwrh.sgIeYZVvnwJh8YWTe',
+    dateCreated: farmer.dateCreated,
+    dateUpdated: farmer.dateUpdated
+  })
 
-    it('should handle server error', async () => {
-      req.body = {
-        firstname: 'New',
-        lastname: 'Farmer',
-        gender: 'male',
-        dob: '1990-01-01',
-        mobile: '0123456789',
-        address: '123 Farm Lane',
-        email: 'newfarmer@example.com',
-        password: 'password'
-      };
-      FarmerModel.register.mockRejectedValue(new Error('Server Error'));
+  // remove mock data
+  await connection.query(
+    `
+    DELETE FROM farmer
+    WHERE farmerId = '${farmer.farmerId}';
+    `
+  )
 
-      await FarmerController.register(req, res);
+  await connection.release();
+})
 
-      expect(res.json).toHaveBeenCalledWith({ message: 'Server Error' });
-    });
-  });
 
-  describe('update', () => {
-    it('should update a farmer successfully', async () => {
-      req.body = {
-        firstname: 'Updated',
-        lastname: 'Farmer',
-        gender: 'male',
-        dob: '1990-01-01',
-        mobile: '0123456789',
-        address: '123 Farm Lane',
-        email: 'updatedfarmer@example.com',
-        password: 'newpassword'
-      };
-      req.user = { farmerId: 1 };
-      const hashedPassword = 'newhashedPassword';
-      bcryptjs.hash.mockResolvedValue(hashedPassword);
-      FarmerModel.update.mockResolvedValue();
 
-      await FarmerController.update(req, res);
+test('Removing a farmer tuple from the database', async() => {
+  const connection = await pool.getConnection();
 
-      expect(bcryptjs.hash).toHaveBeenCalledWith('newpassword', 10);
-      expect(FarmerModel.update).toHaveBeenCalledWith('Updated', 'Farmer', 'male', '1990-01-01', '0123456789', '123 Farm Lane', 'updatedfarmer@example.com', hashedPassword, 1);
-      expect(res.redirect).toHaveBeenCalledWith('/farmer');
-    });
+  let results = await connection.query(
+    `
+    INSERT INTO TABLE farmer
+    VALUES 
+    (
+      '10000',
+      'Test',
+      'Farmer',
+      'male',
+      '2000-01-01',
+      '01211111111',
+      'Sec#1, Rd#1, Hs#1',
+      'src/farmer/test-farmer/nid.jpg',
+      'src/farmer/test-farmer/pfp.jpg',
+      'test.farmer@test.com',
+      '$2a$10$5goTEE9qnD/7ewbL4C3TquApUmlFL0Jdwrh.sgIeYZV',
+      '2024-12-02',
+      '2024-12-02'
+    ),
+    (
+      '10001',
+      'Test 2',
+      'Farmer 2',
+      'female',
+      '2001-02-02',
+      '01322222222',
+      'Sec#2, Rd#2, Hs#2',
+      'src/farmer/test-farmer-2/nid.jpg',
+      'src/farmer/test-farmer-2/pfp.jpg',
+      'test2.farmer2@test2.com',
+      '$2a$10$5goTEE9qnD/7ewbL4C3TquApUmlFL0Jdwrh.sgIeYZV',
+      '2024-12-02',
+      '2024-12-02'
+    )
+    `
+  );
 
-    it('should return message when required fields are missing', async () => {
-      req.body = {
-        lastname: 'Farmer',
-        gender: 'male',
-        dob: '1990-01-01',
-        mobile: '0123456789',
-        address: '123 Farm Lane',
-        email: 'updatedfarmer@example.com'
-      };
-      req.user = { farmerId: 1 };
 
-      await FarmerController.update(req, res);
+  const req = {
+    user: {
+      farmerId: 10000
+    }
+  };
+  const res = {
+    redirect: jest.fn().mockReturnThis()
+  }
+  await FarmerController.delete(req, res);
 
-      expect(res.json).toHaveBeenCalledWith({ message: 'All required input fields must be filled!' });
-    });
+  //Verify the response
+  expect(res.redirect).toHaveBeenCalledWith('/farmer/register');
 
-    it('should handle duplicate entry error', async () => {
-      req.body = {
-        firstname: 'Updated',
-        lastname: 'Farmer',
-        gender: 'male',
-        dob: '1990-01-01',
-        mobile: '0123456789',
-        address: '123 Farm Lane',
-        email: 'updatedfarmer@example.com',
-        password: 'newpassword'
-      };
-      req.user = { farmerId: 1 };
-      FarmerModel.update.mockRejectedValue({ code: 'ER_DUP_ENTRY', sqlMessage: "Duplicate entry 'updatedfarmer@example.com' for key 'email'" });
 
-      await FarmerController.update(req, res);
+  results = connection.query(
+    `
+    SELECT *
+    FROM farmer
+    WHERE farmerId = 10000
+    `
+  )
+  deletedFarmer = results[0];
 
-      expect(res.json).toHaveBeenCalledWith({ message: 'The email enterred is in use by another account!' });
-    });
+  results = connection.query(
+    `
+    SELECT *
+    FROM farmer
+    WHERE farmerId = 10001
+    `
+  )
+  existingFarmer = results[0];
 
-    it('should handle server error', async () => {
-      req.body = {
-        firstname: 'Updated',
-        lastname: 'Farmer',
-        gender: 'male',
-        dob: '1990-01-01',
-        mobile: '0123456789',
-        address: '123 Farm Lane',
-        email: 'updatedfarmer@example.com',
-        password: 'newpassword'
-      };
-      req.user = { farmerId: 1 };
-      FarmerModel.update.mockRejectedValue(new Error('Server Error'));
+  // ensure deleted account does not exist
+  expect(deletedFarmer).toBe(false);
+  expect(existingFarmer).toBe(true);
+  
+  await connection.release()
 
-      await FarmerController.update(req, res);
-
-      expect(res.json).toHaveBeenCalledWith({ message: 'Server Error' });
-    });
-  });
-
-  describe('delete', () => {
-    it('should delete a farmer successfully', async () => {
-      req.user = {
-        nidImgPath: 'path/to/nid.jpg',
-        farmerId: 1
-      };
-      FarmerModel.delete.mockResolvedValue();
-
-      await FarmerController.delete(req, res);
-
-      expect(FarmerModel.delete).toHaveBeenCalledWith(1);
-      expect(res.redirect).toHaveBeenCalledWith('/farmer/register');
-    });
-
-    it('should handle server error', async () => {
-      req.user = {
-        nidImgPath: 'path/to/nid.jpg',
-        farmerId: 1
-      };
-      FarmerModel.delete.mockRejectedValue(new Error('Server Error'));
-
-      await FarmerController.delete(req, res);
-
-      expect(res.json).toHaveBeenCalledWith({ message: 'Server Error' });
-    });
-  });
-});
+})

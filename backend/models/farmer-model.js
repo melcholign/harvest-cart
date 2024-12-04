@@ -251,8 +251,10 @@ class FarmerModel {
             console.log("Error executing query:" + err);
             throw err;
         }
-
     }
 }
+
+//console.log(await FarmerModel.register('weiofj', 'eofjaw', 'other', '2222-02-02', '018053','wefiojwe','wiojgaw','wejfawej', 'person@gmail.com', '29ruq3p498tuq3t'));
+console.log(await FarmerModel.getByID(1));
 
 export { FarmerModel };

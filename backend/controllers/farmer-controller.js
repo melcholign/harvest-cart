@@ -4,7 +4,6 @@ import fs from 'fs';
 
 
 class FarmerController{
-
     /**
      * Search farmers by name.
      * @param {Object} req - The request object.
