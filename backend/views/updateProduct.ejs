@@ -1,71 +1,160 @@
-<h1>Edit Product</h1>
-<form action="/farmer/store/<%= store.storeId %>/product/<%= product.productId %>/update" method="POST" enctype="multipart/form-data">
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Edit Product</title>
+  <style>
+    /* Main container styling */
+body {
+  font-family: Arial, sans-serif;
+  margin: 20px;
+  background-color: #f9f9f9;
+  color: #333;
+}
 
-  
-  <input type="text" name="storeName" value="<%= store.storeName %>" hidden>
+/* Header styling */
+h1 {
+  color: #4CAF50;
+  font-size: 2em;
+  margin-bottom: 20px;
+}
 
-  <div>
-    <label for="productName">product name</label>
-    <input type="text" id="product_name" name="productName" value="<%= product.productName %>" required>
-  </div>
+/* Form styling */
+form {
+  background-color: #fff;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  padding: 20px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
 
-  <div>
-    <label for="fruits">fruits</label>
-    <input type="radio" id="fruits" name="category" value="fruits" <% if(product.category == 'fruits'){ %> <%= 'checked' %> <% } %> >
+form div {
+  margin-bottom: 15px;
+}
 
-    <label for="vegetables">vegetables</label>
-    <input type="radio" id="vegetables" name="category" value="vegetables" <% if(product.category == 'vegetables'){ %> <%= 'checked' %> <% } %> >
+label {
+  display: block;
+  color: #333;
+  font-size: 1em;
+  margin-bottom: 5px;
+}
 
-    <label for="herbs">herbs</label>
-    <input type="radio" id="herbs" name="category" value="herbs" <% if(product.category == 'herbs'){ %> <%= 'checked' %> <% } %> >
+input[type="text"], input[type="number"], input[type="file"], textarea, input[type="radio"] {
+  width: 100%;
+  padding: 10px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  box-sizing: border-box;
+}
 
-    <label for="dairy">dairy</label>
-    <input type="radio" id="dairy" name="category" value="dairy" <% if(product.category == 'dairy'){ %> <%= 'checked' %> <% } %> >
+textarea {
+  resize: vertical;
+  height: 100px;
+}
 
-    <label for="poultry">poultry</label>
-    <input type="radio" id="poultry" name="category" value="poultry" <% if(product.category == 'poultry'){ %> <%= 'checked' %> <% } %> >
+input[type="radio"] {
+  float: left;
+  width: auto;
+  margin-right: 5px;
+}
 
-    <label for="seafood">seafood</label>
-    <input type="radio" id="seafood" name="category" value="seafood" <% if(product.category == 'seafood'){ %> <%= 'checked' %> <% } %> >
+/* Button styling */
+button {
+  background-color: #4CAF50;
+  color: white;
+  padding: 10px 20px;
+  margin: 5px 2px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 1em;
+}
 
-    <label for="red meat">red meat</label>
-    <input type="radio" id="red meat" name="category" value="red meat" <% if(product.category == 'red meat'){ %> <%= 'checked' %> <% } %> >
+button:hover {
+  background-color: #45a049;
+}
 
-    <label for="fish">fish</label>
-    <input type="radio" id="fish" name="category" value="fish" <% if(product.category == 'fish'){ %> <%= 'checked' %> <% } %> >
+/* Link styling */
+a {
+  color: #4CAF50;
+  text-decoration: none;
+  font-size: 1em;
+}
 
-    <label for="grains">grains</label>
-    <input type="radio" id="grains" name="category" value="grains" <% if(product.category == 'grains'){ %> <%= 'checked' %> <% } %> >
+a:hover {
+  text-decoration: underline;
+}
 
-    <label for="condiments">condiments</label>
-    <input type="radio" id="condiments" name="category" value="condiments" <% if(product.category == 'condiments'){ %> <%= 'checked' %> <% } %> >
+  </style>
+</head>
+<body>
+  <h1>Edit Product</h1>
+  <form action="/farmer/store/<%= store.storeId %>/product/<%= product.productId %>/update" method="POST" enctype="multipart/form-data">
+    <input type="text" name="storeName" value="<%= store.storeName %>" hidden>
 
-    <label for="spices & seasonings">Female</label>
-    <input type="radio" id="spices & seasonings" name="category" value="spices & seasonings" <% if(product.category == 'spices & condiments'){ %> <%= 'checked' %> <% } %> >
+    <div>
+      <label for="productName">product name</label>
+      <input type="text" id="product_name" name="productName" value="<%= product.productName %>" required>
+    </div>
 
-    <label for="miscellaneous">miscellaneous</label>
-    <input type="radio" id="miscellaneous" name="category" value="miscellaneous" <% if(product.category == 'miscellaneous'){ %> <%= 'checked' %> <% } %> >
-  </div>
 
-  <div>
-    <label for="description">description</label>
-    <textarea id="description" name="description"><%= product.description %></textarea>
-  </div>
-  
-  <div>
-    <label for="price">price</label>
-    <input type="number" id="price" name="price" value="<%= product.price %>" required>
-  </div>
+    <label for="category">Category:</label>
+    <div id="category">
+      <input type="radio" id="fruits" name="category" value="fruits" <% if(product.category == 'fruits'){ %> <%= 'checked' %> <% } %>>
+      <label for="fruits">fruits</label>
 
-  <div>
-    <label for="thumbnailImg">thumbnailImg</label>
-    <input type="file" id="thumbnailImg" name="thumbnail" required>
-  </div>
+      <input type="radio" id="vegetables" name="category" value="vegetables" <% if(product.category == 'vegetables'){ %> <%= 'checked' %> <% } %>>
+      <label for="vegetables">vegetables</label>
 
-  <!--
-  <input type="text" name="storeId" value=<%= store.storeId %> hidden>
-  -->
+      <input type="radio" id="herbs" name="category" value="herbs" <% if(product.category == 'herbs'){ %> <%= 'checked' %> <% } %>>
+      <label for="herbs">herbs</label>
 
-  <button type="submit">Confirm</button>
-</form>
-<a href="/farmer/store/<%= store.storeId %>">Cancel</a>
+      <input type="radio" id="dairy" name="category" value="dairy" <% if(product.category == 'dairy'){ %> <%= 'checked' %> <% } %>>
+      <label for="dairy">dairy</label>
+
+      <input type="radio" id="poultry" name="category" value="poultry" <% if(product.category == 'poultry'){ %> <%= 'checked' %> <% } %>>
+      <label for="poultry">poultry</label>
+
+      <input type="radio" id="seafood" name="category" value="seafood" <% if(product.category == 'seafood'){ %> <%= 'checked' %> <% } %>>
+      <label for="seafood">seafood</label>
+
+      <input type="radio" id="red meat" name="category" value="red meat" <% if(product.category == 'red meat'){ %> <%= 'checked' %> <% } %>>
+      <label for="red meat">red meat</label>
+
+      <input type="radio" id="fish" name="category" value="fish" <% if(product.category == 'fish'){ %> <%= 'checked' %> <% } %>>
+      <label for="fish">fish</label>
+
+      <input type="radio" id="grains" name="category" value="grains" <% if(product.category == 'grains'){ %> <%= 'checked' %> <% } %>>
+      <label for="grains">grains</label>
+
+      <input type="radio" id="condiments" name="category" value="condiments" <% if(product.category == 'condiments'){ %> <%= 'checked' %> <% } %>>
+      <label for="condiments">condiments</label>
+
+      <input type="radio" id="spices & seasonings" name="category" value="spices & seasonings" <% if(product.category == 'spices & condiments'){ %> <%= 'checked' %> <% } %>>
+      <label for="spices & seasonings">spices & seasonings</label>
+
+      <input type="radio" id="miscellaneous" name="category" value="miscellaneous" <% if(product.category == 'miscellaneous'){ %> <%= 'checked' %> <% } %>>
+      <label for="miscellaneous">miscellaneous</label>
+    </div>
+
+    <div>
+      <label for="description">description</label>
+      <textarea id="description" name="description"><%= product.description %></textarea>
+    </div>
+    
+    <div>
+      <label for="price">price</label>
+      <input type="number" id="price" name="price" value="<%= product.price %>" required>
+    </div>
+
+    <div>
+      <label for="thumbnailImg">thumbnailImg</label>
+      <input type="file" id="thumbnailImg" name="thumbnail" required>
+    </div>
+
+    <button type="submit">Confirm</button>
+  </form>
+  <a href="/farmer/store/<%= store.storeId %>">Cancel</a>
+</body>
+</html>

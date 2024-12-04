@@ -1,27 +1,114 @@
-<h1>Edit Store</h1>
-<form action="/farmer/store/<%= store.storeId %>/update" method="POST" enctype="multipart/form-data">
-  <div>
-    <label for="storeName">store name</label>
-    <input type="text" id="storeName" name="storeName" value="<%=store.storeName %>" required>
-  </div>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Edit Store</title>
+  <style>
+    /* Main container styling */
+body {
+  font-family: Arial, sans-serif;
+  margin: 20px;
+  background-color: #f9f9f9;
+  color: #333;
+}
 
-  <div>
-    <label for="description">description</label>
-    <textarea id="description" name="description" required><%=store.description %></textarea>
-  </div>
+/* Header styling */
+h1 {
+  color: #4CAF50;
+  font-size: 2em;
+  margin-bottom: 20px;
+}
 
-  <div>
-    <label for="gallery_imgs">gallery_imgs</label>
-    <input type="file" id="gallery_imgs" name="gallery" multiple/>
-  </div>
-  <div>
-    <label for="cover_img">cover_img</label>
-    <input type="file" id="cover_img" name="cover" />
-  </div>
+/* Form styling */
+form {
+  background-color: #fff;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  padding: 20px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
 
-  <button type="submit">Done</button>
-</form>
+form div {
+  margin-bottom: 15px;
+}
 
-<form action="/farmer/store/<%= store.storeId %>" method="GET">
-    <button type="submit">Cancel</button>
-</form>
+label {
+  display: block;
+  color: #333;
+  font-size: 1em;
+  margin-bottom: 5px;
+}
+
+input[type="text"], input[type="file"], textarea {
+  width: 100%;
+  padding: 10px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  box-sizing: border-box;
+}
+
+textarea {
+  resize: vertical;
+  height: 100px;
+}
+
+/* Button styling */
+button {
+  background-color: #4CAF50;
+  color: white;
+  padding: 10px 20px;
+  margin: 5px 2px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 1em;
+}
+
+button:hover {
+  background-color: #45a049;
+}
+
+/* Link styling */
+a {
+  color: #4CAF50;
+  text-decoration: none;
+  font-size: 1em;
+}
+
+a:hover {
+  text-decoration: underline;
+}
+
+  </style>
+</head>
+<body>
+  <h1>Edit Store</h1>
+  <form action="/farmer/store/<%= store.storeId %>/update" method="POST" enctype="multipart/form-data">
+    <div>
+      <label for="storeName">store name</label>
+      <input type="text" id="storeName" name="storeName" value="<%=store.storeName %>" required>
+    </div>
+
+    <div>
+      <label for="description">description</label>
+      <textarea id="description" name="description" required><%=store.description %></textarea>
+    </div>
+
+    <div>
+      <label for="gallery_imgs">gallery_imgs</label>
+      <input type="file" id="gallery_imgs" name="gallery" multiple/>
+    </div>
+    <div>
+      <label for="cover_img">cover_img</label>
+      <input type="file" id="cover_img" name="cover" />
+    </div>
+
+    <button type="submit">Done</button>
+  </form>
+
+  <form action="/farmer/store/<%= store.storeId %>" method="GET">
+      <button type="submit">Cancel</button>
+  </form>
+</body>
+</html>

@@ -1,47 +1,138 @@
-<h1>Register</h1>
-<form action="/farmer/register" method="POST" enctype="multipart/form-data">
-  <div>
-    <label for="firstname">firstname</label>
-    <input type="text" id="firstname" name="firstname">
-  </div>
-  <div>
-    <label for="lastname">lastname</label>
-    <input type="text" id="lastname" name="lastname" required>
-  </div>
-  <div>
-    <label for="female">Female</label>
-    <input type="radio" id="gender" name="gender" value="female">
-    <label for="male">Male</label>
-    <input type="radio" id="male" name="gender" value="male">
-  </div>
-  <div>
-    <label for="dob">Date of birth</label>
-    <input type="date" id="dob" name="dob" required>
-  </div>
-  <div>
-    <label for="mobile">mobile</label>
-    <input type="number" id="mobile" name="mobile" required>
-  </div>
-  <div>
-    <label for="address">address</label>
-    <input type="text" id="address" name="address" required>
-  </div>
-  <div>
-    <label for="nid_img">nid_img</label>
-    <input type="file" id="nid_img" name="nid" />
-  </div>
-  <div>
-    <label for="pfp_img">pfp_img</label>
-    <input type="file" id="pfp_img" name="pfp" />
-  </div>
-  <div>
-    <label for="email">email</label>
-    <input type="email" id="email" name="email" required>
-  </div>
-  <div>
-    <label for="password">password</label>
-    <input type="password" id="password" name="password" required>
-  </div>
-  <button type="submit">Register</button>
-</form>
-<a href="/farmer/login">Login</a>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Register</title>
+  <style>
+    /* Main container styling */
+body {
+  font-family: Arial, sans-serif;
+  margin: 20px;
+  background-color: #f9f9f9;
+  color: #333;
+}
+
+/* Header styling */
+h1 {
+  color: #4CAF50;
+  font-size: 2em;
+  margin-bottom: 20px;
+}
+
+/* Form styling */
+form {
+  background-color: #fff;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  padding: 20px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+form div {
+  margin-bottom: 15px;
+}
+
+label {
+  display: block;
+  color: #333;
+  font-size: 1em;
+  margin-bottom: 5px;
+}
+
+input, select {
+  width: 100%;
+  padding: 10px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  box-sizing: border-box;
+}
+
+/* Radio buttons styling */
+input[type="radio"] {
+  float: left;
+  width: auto;
+  margin-right: 5px;
+}
+
+/* Button styling */
+button {
+  background-color: #4CAF50;
+  color: white;
+  padding: 10px 20px;
+  margin: 5px 2px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 1em;
+}
+
+button:hover {
+  background-color: #45a049;
+}
+
+/* Link styling */
+a {
+  color: #4CAF50;
+  text-decoration: none;
+  font-size: 1em;
+}
+
+a:hover {
+  text-decoration: underline;
+}
+
+  </style>
+</head>
+<body>
+  <h1>Register</h1>
+  <form action="/farmer/register" method="POST" enctype="multipart/form-data">
+    <div>
+      <label for="firstname">Firstname</label>
+      <input type="text" id="firstname" name="firstname">
+    </div>
+    <div>
+      <label for="lastname">Lastname</label>
+      <input type="text" id="lastname" name="lastname" required>
+    </div>
+
+    <label for="gender">Gender:</label>
+    <div id="gender">
+      <input type="radio" id="female" name="gender" value="female">
+      <label for="female">Female</label>
+      <input type="radio" id="male" name="gender" value="male">
+      <label for="male">Male</label>
+    </div>
+    <div>
+      <label for="dob">Date of birth</label>
+      <input type="date" id="dob" name="dob" required>
+    </div>
+    <div>
+      <label for="mobile">Mobile</label>
+      <input type="number" id="mobile" name="mobile" required>
+    </div>
+    <div>
+      <label for="address">Address</label>
+      <input type="text" id="address" name="address" required>
+    </div>
+    <div>
+      <label for="nid_img">nid_img</label>
+      <input type="file" id="nid_img" name="nid" />
+    </div>
+    <div>
+      <label for="pfp_img">pfp_img</label>
+      <input type="file" id="pfp_img" name="pfp" />
+    </div>
+    <div>
+      <label for="email">email</label>
+      <input type="email" id="email" name="email" required>
+    </div>
+    <div>
+      <label for="password">password</label>
+      <input type="password" id="password" name="password" required>
+    </div>
+    <button type="submit">Register</button>
+  </form>
+  <a href="/farmer/login">Login</a>
+</body>
+</html>
