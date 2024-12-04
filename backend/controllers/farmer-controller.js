@@ -1,4 +1,4 @@
-import { FarmerModel } from '../models/farmerModel.js';
+import { FarmerModel } from '../models/farmer-model.js';
 import bcryptjs from 'bcryptjs';
 import fs from 'fs';
 

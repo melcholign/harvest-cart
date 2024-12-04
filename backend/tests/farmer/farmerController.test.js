@@ -1,4 +1,4 @@
-import { FarmerController } from '../controllers/farmerController';
+import { FarmerController } from '../controllers/farmer-controller.js';
 import { FarmerModel } from '../models/farmerModel';
 import bcryptjs from 'bcryptjs';
 import fs from 'fs';

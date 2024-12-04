@@ -1,5 +1,5 @@
 import express from 'express';
-import { ProductController } from '../controllers/productController.js';
+import { ProductController } from '../controllers/product-controller.js';
 import { StoreModel } from '../models/storeModel.js';
 import { ProductModel } from '../models/product-model.js';
 import fs from 'fs';

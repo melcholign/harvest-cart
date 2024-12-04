@@ -2,7 +2,7 @@ import passport from 'passport';
 import { useLocalCustomerStrategy } from './local-strategies/customer.js';
 import { useLocalFarmerStrategy } from './local-strategies/farmer.js';
 import { CustomerModel } from '../../models/customer-model.js';
-import { FarmerModel } from '../../models/farmerModel.js';
+import { FarmerModel } from '../../models/farmer-model.js';
 
 
 useLocalCustomerStrategy(passport);

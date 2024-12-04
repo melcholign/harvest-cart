@@ -1,7 +1,7 @@
 import express from 'express';
-import { FarmerController } from '../controllers/farmerController.js';
+import { FarmerController } from '../controllers/farmer-controller.js';
 import { passport } from '../middlewares/passport/passport-config.js';
-import { FarmerModel } from '../models/farmerModel.js';
+import { FarmerModel } from '../models/farmer-model.js';
 import fs from 'fs';
 import multer from 'multer';
 

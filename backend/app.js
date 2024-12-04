@@ -10,9 +10,9 @@ import { passport } from './middlewares/passport/passport-config.js';
 import { customerRouter } from './routes/customer-router.js';
 import { basketRouter } from './routes/basket-router.js';
 import { checkoutRouter } from './routes/checkout-router.js';
-import { farmerRouter } from './routes/farmerRouter.js';
-import { storeRouter } from './routes/storeRouter.js';
-import { productRouter } from './routes/productRouter.js';
+import { farmerRouter } from './routes/farmer-router.js';
+import { storeRouter } from './routes/store-router.js';
+import { productRouter } from './routes/product-router.js';
 import { genericProductRouter } from './routes/generic-product-router.js';
 
 const app = express();

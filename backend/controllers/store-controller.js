@@ -1,4 +1,4 @@
-import { StoreModel } from "../models/storeModel.js";
+import { StoreModel } from "../models/store-model.js";
 import fs from 'fs';
 
 class StoreController{

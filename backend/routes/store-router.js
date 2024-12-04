@@ -1,5 +1,5 @@
 import express from 'express';
-import { StoreController } from '../controllers/storeController.js';
+import { StoreController } from '../controllers/store-controller.js';
 import { StoreModel } from '../models/storeModel.js';
 import fs from 'fs';
 import multer from 'multer';
